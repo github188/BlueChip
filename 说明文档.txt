@@ -1,0 +1,5 @@
+使用步骤说明:
+1.此SDK是针对UTV007主芯片开发的,请针对所使用硬件安装正确的驱动程序
+2.打开release文件夹,运行vcredist_x86
+3.用管理员身份手动注册Deinterlace.ax:regsvr32 (Deinterlace.ax所在路径)\Deinterlace.ax
+4.运行AutoBusCount
