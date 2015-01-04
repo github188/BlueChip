@@ -36,6 +36,14 @@ CAutoBusCountApp::CAutoBusCountApp()
 
 CAutoBusCountApp theApp;
 
+// date object
+CDate * date;
+
+// info object
+CInfo* info;
+
+// video process object
+CVideoProc* videoProc;
 
 // CAutoBusCountApp initialization
 

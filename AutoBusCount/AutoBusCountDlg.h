@@ -7,8 +7,13 @@
 
 #include "sdk_uv200.h"
 
+#include "Date.h"
+#include "VideoProc.h"
+#include "Info.h"
+
 
 // CAutoBusCountDlg dialog
+
 class CAutoBusCountDlg : public CDialogEx
 {
 // Construction
@@ -33,12 +38,13 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
-private:
-	// the number of people get on
-	int m_iIn;
-	// the number of people get off
-	int m_iOut;
 public:
 	CStatic m_conShowWin;
+	afx_msg void OnBnClickedButton1();
+
+private:
+	bool m_bStop;
+public:
+	afx_msg void OnBnClickedButton2();
 };
 

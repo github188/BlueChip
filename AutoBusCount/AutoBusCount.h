@@ -10,7 +10,6 @@
 
 #include "resource.h"		// main symbols
 
-
 // CAutoBusCountApp:
 // See AutoBusCount.cpp for the implementation of this class
 //
@@ -25,6 +24,7 @@ public:
 public:
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
+
 
 // Implementation
 

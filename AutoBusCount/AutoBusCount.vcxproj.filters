@@ -22,6 +22,30 @@
     <None Include="res\AutoBusCount.ico">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="res\background.png">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\bitmap1.bmp">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\bitmap2.bmp">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\background.jpg">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\bitmap3.bmp">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\bitmap4.bmp">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\icon1.ico">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\logo.ico">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoBusCount.h">
@@ -42,6 +66,18 @@
     <ClInclude Include="sdk_uv200.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Date.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoProc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="rgbgmfgd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Info.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AutoBusCount.cpp">
@@ -51,6 +87,18 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Date.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoProc.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="rgbgmfgd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Info.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
