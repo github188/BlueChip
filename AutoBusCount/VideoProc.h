@@ -39,6 +39,38 @@ public:
 	int m_iIn;
 	int m_iOut;
 	int m_iOnboard;
+	int m_x;
+	int m_y;
+	int m_width;
+	int m_height;
+	/**人头检测方法*********************************************/
+	int nFrmNum;
+	CvRect rect1,rect2;
+	int framecnt;
+	int frameseqcnt[5];
+	bool singleflag;
+	int high ;
+	int low ;
+	bool up;
+	bool isup;
+	bool isin;
+
+    time_t rawtime; 
+	time_t lastrawtime ;
+
+//	frame->origin = image->origin ;
+//	grayframe->origin = image->origin ;
+//用于方向检测的区域
+
+    int objforori1;
+	int objforori2;
+	
+	int objpix;//压线的像素数目
+    int last_objpix;
+    int lastnFrmNum ;
+
+	int m_highlow;
+	/**人头检测方法*********************************************/
 protected:
 	int Init(IplImage* image);
 private:

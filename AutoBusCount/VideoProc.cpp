@@ -12,9 +12,32 @@ CVideoProc::CVideoProc(void)
 	imagegrey=NULL;
 	m_bInit=false;
 	m_bImage=10;
-	rect=cvRect(0,200,720,100); //检测区大小
+	m_x=0;
+	m_y=80;
+	m_width=720;
+	m_height=400;
+	rect=cvRect(m_x,m_y,m_width,m_height); //检测区大小
+	rect1=cvRect(0,0,m_width,(int)(0.1*m_height));
+	rect2=cvRect(0,(int)(0.9*m_height),m_width,(int)(0.1*m_height));
 	line=288;
 	tmp_Onboard=0;
+
+	framecnt=0;
+	high = 2000;
+	low = 1500;
+	up=FALSE;
+	isup=FALSE;
+	isin=FALSE;
+	singleflag = FALSE;
+	nFrmNum = 0;
+	lastrawtime = 0;
+    objforori1=0;
+	objforori2=0;
+	objpix=0;//压线的像素数目
+    last_objpix=0;
+    lastnFrmNum = 0;
+	m_highlow=2500;
+
 }
 
 
@@ -37,6 +60,7 @@ int CVideoProc::Init(IplImage* m_image)
 	edge = cvCreateImage(cvGetSize(image),IPL_DEPTH_8U,1);
 	cvZero(preimagegrey);
 	cvZero(prepreimagegrey);
+	cvZero(gray);
 	return 1;
 }
 int CVideoProc::Process(IplImage* image)
@@ -52,14 +76,14 @@ int CVideoProc::Process(IplImage* image)
 		return 0;
 	}
 	/*******背景建模*****************/
-	fgdetector.Process(image);
-	//cvRectangle(grayframe,cvPoint(0,0),cvPoint(50,50),CV_RGB(255,0,0),1,CV_AA,0);
-	grayframe = fgdetector.GetMask();
-	grayframe->origin=IPL_ORIGIN_BL;
-#ifdef DEBUG
-	cvNamedWindow("grayframe");
-	cvShowImage("grayframe",grayframe);
-#endif
+//	fgdetector.Process(image);
+//	//cvRectangle(grayframe,cvPoint(0,0),cvPoint(50,50),CV_RGB(255,0,0),1,CV_AA,0);
+//	grayframe = fgdetector.GetMask();
+//	grayframe->origin=IPL_ORIGIN_BL;
+//#ifdef DEBUG
+//	cvNamedWindow("grayframe");
+//	cvShowImage("grayframe",grayframe);
+//#endif
 	/******帧差********************/
 	cvCvtColor(image,imagegrey, CV_BGR2GRAY);////当前帧->frame[0]
 	cvAbsDiff(imagegrey, preimagegrey, absdiff); 
@@ -68,10 +92,11 @@ int CVideoProc::Process(IplImage* image)
 	cvThreshold(absdiff, absthresh, 20, 255.0, CV_THRESH_BINARY);//二值化前景图
 	cvErode(absthresh, absthresh, 0, 1);	
 	cvDilate(absthresh, absthresh, 0, 1);
-	absthresh->origin=IPL_ORIGIN_BL;
 #ifdef DEBUG
+	absthresh->origin=IPL_ORIGIN_BL;
 	cvNamedWindow("absthresh");
 	cvShowImage("absthresh",absthresh);
+	absthresh->origin=IPL_ORIGIN_TL;
 #endif
 	cvCopy(preimagegrey,prepreimagegrey);	
 	cvCopy(imagegrey,preimagegrey);	
@@ -85,64 +110,145 @@ int CVideoProc::Process(IplImage* image)
 
 	if((destination[0].y+destination[0].height > 80 )&&(destination[0].height>40))
 	{
-		DrawRect(absthresh,destination[0],CV_RGB(255,255,255));
-		DrawRect(image,destination[0],CV_RGB(0,255,0));
+		//DrawRect(absthresh,destination[0],CV_RGB(255,255,255));
+		//DrawRect(image,destination[0],CV_RGB(0,255,0));
 	}
 	if((p>1)&&(destination[1].height>40)) //说明两个人连续上车
 	{
-		DrawRect(absthresh,destination[1],CV_RGB(255,255,255));
-		DrawRect(image,destination[1],CV_RGB(0,255,0));
+		//DrawRect(absthresh,destination[1],CV_RGB(255,255,255));
+		//DrawRect(image,destination[1],CV_RGB(0,255,0));
 		destination[0]=destination[1];
 	}	
 #ifdef DEBUG
 	image->origin = IPL_ORIGIN_BL;
 	cvNamedWindow("image");
 	cvShowImage("image",image);
+	image->origin = IPL_ORIGIN_TL;
 #endif
 	/*****************边缘***********************************************************/
-#ifdef DEBUG
-	//cvSmooth(pFrameMat, pFrameMat, CV_GAUSSIAN, 3, 0, 0);
-	cvSmooth( absthresh, edge, CV_BLUR, 3, 3, 0, 0 );//滤波函数，在这里貌似不起作用，因为产生的结果被下面的函数产生的结果覆盖
-	cvNot( absthresh, edge );//按位取反函数，在这里貌似不起作用，因为产生的结果被下面的函数产生的结果覆盖
-	cvCanny(absthresh, edge, EDGE_THRESH, EDGE_THRESH*3, 3);//边缘检测
-	//cvRectangle(edge,cvPoint(m_x,m_y),cvPoint(m_x+m_width,m_y+m_height),CV_RGB(255,0,0),1,CV_AA,0);
-//	edge->origin = IPL_ORIGIN_BL;
-//	DrawPicToHDC(edge, IDC_STATIC_PIC3,1);	
-//	edge->origin = IPL_ORIGIN_TL;		
-#endif
+//#ifdef DEBUG
+//	//cvSmooth(pFrameMat, pFrameMat, CV_GAUSSIAN, 3, 0, 0);
+//	cvSmooth( absthresh, edge, CV_BLUR, 3, 3, 0, 0 );//滤波函数，在这里貌似不起作用，因为产生的结果被下面的函数产生的结果覆盖
+//	cvNot( absthresh, edge );//按位取反函数，在这里貌似不起作用，因为产生的结果被下面的函数产生的结果覆盖
+//	cvCanny(absthresh, edge, EDGE_THRESH, EDGE_THRESH*3, 3);//边缘检测
+//	//cvRectangle(edge,cvPoint(m_x,m_y),cvPoint(m_x+m_width,m_y+m_height),CV_RGB(255,0,0),1,CV_AA,0);
+////	edge->origin = IPL_ORIGIN_BL;
+////	DrawPicToHDC(edge, IDC_STATIC_PIC3,1);	
+////	edge->origin = IPL_ORIGIN_TL;		
+//#endif
 	/************************方向检测***********************************************************/
-	if((destination[0].y+(int)(destination[0].height/2)-line)*(predestination[0].y+(int)(predestination[0].height/2)-line)<0)
+	//设定检测框
+	//cvSetImageROI(image,rect);	
+	//cvCvtColor(image, gray, CV_BGR2GRAY);//背景检测直接用temp,改一下
+	//cvThreshold(gray, gray, 75, 255, CV_THRESH_BINARY_INV);
+	Findcontour(absthresh,gray,destination[0]);
+	gray=cvCloneImage(absthresh);
+	cvSetImageROI(gray,rect);
+	
+#ifdef DEBUG
+	gray->origin = IPL_ORIGIN_BL;
+	cvNamedWindow("gray");
+	cvShowImage("gray",gray);
+	gray->origin = IPL_ORIGIN_TL;
+#endif
+	last_objpix=objpix;
+	if(up==TRUE) isup=TRUE;
+	else isup=FALSE;
+	
+	objpix=cvCountNonZero(gray);
+	if(nFrmNum==0)
 	{
-		if(abs(destination[0].y+(int)(destination[0].height/2)-line)<150&&abs(predestination[0].y+(int)(predestination[0].height/2)-line)<150)
-		{
-			if(destination[0].y+(int)(destination[0].height/2)-line<0)
-			{
-				m_iOut++;
-				tmp_Onboard=m_iOnboard;
-				m_iOnboard--;
-				predestination[0]=destination[0];
-				if(m_iOnboard==5) //到达目的地
-				{
-					return 3;
-				}
-				return 2;
-			}
-			else
-				m_iIn++;
-			    tmp_Onboard=m_iOnboard;
-				m_iOnboard++;
-				predestination[0]=destination[0];
-				if(m_iIn==5) //开始
-				{
-					time_t t = time(0); 
-					strftime( start, sizeof(start), "%H:%M:%S",localtime(&t) ); 
-					puts( start ); 
-				}
-				return 1;
+		low=objpix;
+		high=objpix;
+		nFrmNum++;
+	}
+	if (objpix-last_objpix>=0)
+		up=TRUE;
+	else up=FALSE;
+	if (isup==FALSE&&up==TRUE&&objpix<low&&!isin)// 进来的话，low不再更新,否则，
+		//low是最小极小值
+	{	
+		low=objpix;
+		//cout<<objpix<<","<<nFrmNum<<endl;
+	}
+
+	if(objpix-low>m_highlow && !isin && up )//上升阶段才可能进入
+	{
+		isin=TRUE;//进来就不管up或down了，不断更新high保证最大峰值，并探测下降程度
+		cvSetImageROI(gray,rect1);
+		objforori1=cvCountNonZero(gray);
+		cvResetImageROI(gray);
+		cvSetImageROI(gray,rect2);
+		objforori2=cvCountNonZero(gray);
+		cvResetImageROI(gray);
+		high=objpix;
+	}
+	if (isup==FALSE&&up==TRUE&&isin)
+	{	
+		low=objpix;
+	}
+	if(isin&&isup&&!up)//进来没出去时，就要保证high为最大极大值
+	{
+		high=(high>objpix?high:objpix);
+	}
+	if(high-objpix>m_highlow && isin)//出去
+	{
+		isin=FALSE;
+		cvSetImageROI(gray,rect1);
+		objforori1-=cvCountNonZero(gray);
+		cvResetImageROI(gray);
+		cvSetImageROI(gray,rect2);
+		objforori2=cvCountNonZero(gray)-objforori2;
+		cvResetImageROI(gray);
+		if(objforori2+objforori1>0)
+		{	
+			m_iIn++;
+			Beep(440,25);
+			return 1;
 		}
-		predestination[0]=destination[0];
-		return 0;
-	}	
+		else 
+		{	
+			m_iOut++;
+			Beep(440,25);
+			return 2;
+		}
+	}
+
+	return 0;
+
+	//if(((float)destination[0].y+(destination[0].height/2)-(float)line)*((float)predestination[0].y+(predestination[0].height/2)-(float)line)<0.00f)
+	//{
+	//	if(abs((float)destination[0].y+(destination[0].height/2)-(float)line)<100.0f&&abs((float)predestination[0].y+(predestination[0].height/2)-(float)line)<75.0f)
+	//	{
+	//		if((float)destination[0].y+(destination[0].height/2)-(float)line<0.00f) //下车
+	//		{
+	//			m_iOut++;
+	//			tmp_Onboard=m_iOnboard;
+	//			m_iOnboard--;
+	//			if(m_iOnboard<0) m_iOnboard=0;
+	//			predestination[0]=destination[0];
+	//			if(m_iOnboard==5) //到达目的地
+	//			{
+	//				return 3;
+	//			}
+	//			return 2;
+	//		}
+	//		else if((float)destination[0].y+(destination[0].height/2)-(float)line>0.00f) //上车
+	//			m_iIn++;
+	//		    tmp_Onboard=m_iOnboard;
+	//			m_iOnboard++;
+	//			predestination[0]=destination[0];
+	//			if(m_iOnboard==5) //开始
+	//			{
+	//				time_t t = time(0); 
+	//				strftime( start, sizeof(start), "%H:%M:%S",localtime(&t) ); 
+	//				puts( start ); 
+	//			}
+	//			return 1;
+	//	}
+	//	predestination[0]=destination[0];
+	//	return 0;
+	//}	
 }
 /************************************************************************/
 /* 在原有二值图的基础上找出 边缘轮廓 要预测     直接将预测的结果显示出来

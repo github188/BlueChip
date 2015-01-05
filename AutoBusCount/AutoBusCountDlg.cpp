@@ -107,8 +107,8 @@ void CALLBACK TimerProc(HWND hWnd, UINT nMsg, UINT nIDEvent, DWORD dwTime) //»Øµ
 		date->m_iIn=videoProc->GetInNum();
 		date->m_iOut=videoProc->GetOutNmu();
 		date->m_iOnBoard=videoProc->GetOnboardNmu();
-		date->UpdateData(false);
 		/**********¸üÐÂÊý¾ÝÏÔÊ¾********************************/
+		date->UpdateData(false);
 		//cvShowImage("m_Image",m_Image);
 		delete p;
 	}
@@ -263,7 +263,7 @@ BOOL CAutoBusCountDlg::OnInitDialog()
 	mysql_query(&myCont, "SET NAMES UTF8"); 
 	//::AfxMessageBox(connect);
 
-	SetTimer(1,120,TimerProc);
+	SetTimer(1,80,TimerProc);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
