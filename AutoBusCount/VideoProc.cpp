@@ -12,13 +12,13 @@ CVideoProc::CVideoProc(void)
 	imagegrey=NULL;
 	m_bInit=false;
 	m_bImage=10;
-	m_x=0;
-	m_y=80;
+	m_x=0;	
 	m_width=720;
-	m_height=400;
+	m_height=100;
+	m_y=288-(int)m_height*0.5;
 	rect=cvRect(m_x,m_y,m_width,m_height); //检测区大小
-	rect1=cvRect(0,0,m_width,(int)(0.1*m_height));
-	rect2=cvRect(0,(int)(0.9*m_height),m_width,(int)(0.1*m_height));
+	rect1=cvRect(0,0,m_width,10);
+	rect2=cvRect(0,(int)0.9*m_height,m_width,(int)0.1*m_height);
 	line=288;
 	tmp_Onboard=0;
 
@@ -54,6 +54,7 @@ int CVideoProc::Init(IplImage* m_image)
 	absdiff_2 = cvCreateImage(cvGetSize(image),IPL_DEPTH_8U,1);
 	absdiff = cvCreateImage(cvGetSize(image),IPL_DEPTH_8U,1);
 	absthresh = cvCreateImage(cvGetSize(image),IPL_DEPTH_8U,1);
+	absthresh_2 = cvCreateImage(cvGetSize(image),IPL_DEPTH_8U,1);
 	preimagegrey = cvCreateImage(cvSize(image->width,image->height),IPL_DEPTH_8U,1);
 	prepreimagegrey = cvCreateImage(cvSize(image->width,image->height),IPL_DEPTH_8U,1);
 	gray = cvCreateImage(cvSize(720,576),IPL_DEPTH_8U,1);
@@ -76,13 +77,14 @@ int CVideoProc::Process(IplImage* image)
 		return 0;
 	}
 	/*******背景建模*****************/
-//	fgdetector.Process(image);
+	fgdetector.Process(image);
 //	//cvRectangle(grayframe,cvPoint(0,0),cvPoint(50,50),CV_RGB(255,0,0),1,CV_AA,0);
-//	grayframe = fgdetector.GetMask();
-//	grayframe->origin=IPL_ORIGIN_BL;
+	grayframe = fgdetector.GetMask();	
 //#ifdef DEBUG
+//grayframe->origin=IPL_ORIGIN_BL;
 //	cvNamedWindow("grayframe");
 //	cvShowImage("grayframe",grayframe);
+//grayframe->origin=IPL_ORIGIN_TL;
 //#endif
 	/******帧差********************/
 	cvCvtColor(image,imagegrey, CV_BGR2GRAY);////当前帧->frame[0]
@@ -128,23 +130,30 @@ int CVideoProc::Process(IplImage* image)
 	/*****************边缘***********************************************************/
 //#ifdef DEBUG
 //	//cvSmooth(pFrameMat, pFrameMat, CV_GAUSSIAN, 3, 0, 0);
-//	cvSmooth( absthresh, edge, CV_BLUR, 3, 3, 0, 0 );//滤波函数，在这里貌似不起作用，因为产生的结果被下面的函数产生的结果覆盖
-//	cvNot( absthresh, edge );//按位取反函数，在这里貌似不起作用，因为产生的结果被下面的函数产生的结果覆盖
-//	cvCanny(absthresh, edge, EDGE_THRESH, EDGE_THRESH*3, 3);//边缘检测
+	cvSmooth( absthresh, edge, CV_BLUR, 3, 3, 0, 0 );//滤波函数，在这里貌似不起作用，因为产生的结果被下面的函数产生的结果覆盖
+	cvNot( absthresh, edge );//按位取反函数，在这里貌似不起作用，因为产生的结果被下面的函数产生的结果覆盖
+    cvCanny(absthresh, edge, EDGE_THRESH, EDGE_THRESH*3, 3);//边缘检测
 //	//cvRectangle(edge,cvPoint(m_x,m_y),cvPoint(m_x+m_width,m_y+m_height),CV_RGB(255,0,0),1,CV_AA,0);
 ////	edge->origin = IPL_ORIGIN_BL;
 ////	DrawPicToHDC(edge, IDC_STATIC_PIC3,1);	
 ////	edge->origin = IPL_ORIGIN_TL;		
 //#endif
 	/************************方向检测***********************************************************/
+	CvMemStorage *pStorage = NULL;    
+	pStorage = cvCreateMemStorage(0);   
+	CvSeq *pConInner = NULL;  
+	CvSeq *pContour = NULL;     
+	cvFindContours(absthresh,pStorage,&pContour, sizeof(CvContour), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+	cvZero(absthresh);
+	cvDrawContours(absthresh, pContour, CV_RGB(255, 255, 255), CV_RGB(255, 255, 255), 2, CV_FILLED, 8, cvPoint(0, 0));    
+	//nFrmNum++;
 	//设定检测框
 	//cvSetImageROI(image,rect);	
 	//cvCvtColor(image, gray, CV_BGR2GRAY);//背景检测直接用temp,改一下
 	//cvThreshold(gray, gray, 75, 255, CV_THRESH_BINARY_INV);
 	Findcontour(absthresh,gray,destination[0]);
 	gray=cvCloneImage(absthresh);
-	cvSetImageROI(gray,rect);
-	
+	cvSetImageROI(gray,rect);	
 #ifdef DEBUG
 	gray->origin = IPL_ORIGIN_BL;
 	cvNamedWindow("gray");

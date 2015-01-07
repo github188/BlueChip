@@ -78,7 +78,7 @@ private:
 	bool m_bInit; //是否初始化
 	int m_bImage; //是否第一帧
 	CRGBGaussianFGD fgdetector;
-	IplImage *grayframe,*imagegrey,*preimagegrey,*prepreimagegrey,*absdiff_1,*absdiff_2,*absdiff,*absthresh,*edge,*gray;
+	IplImage *grayframe,*imagegrey,*preimagegrey,*prepreimagegrey,*absdiff_1,*absdiff_2,*absdiff,*absthresh,*edge,*gray,*absthresh_2;
 	int tmp_Onboard;
 	CvRect rect; //检测区
 	int line; //检测线
