@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #include "VideoProc.h"
 
+#define V1_5_0
+
 #define EDGE_THRESH 70
 
 
@@ -15,13 +17,21 @@ CVideoProc::CVideoProc(void)
 	m_x=0;	
 	m_width=720;
 	m_height=100;
+	m_rheight=10;
 	m_y=288-(int)m_height*0.5;
 	rect=cvRect(m_x,m_y,m_width,m_height); //检测区大小
 	rect1=cvRect(0,0,m_width,10);
-	rect2=cvRect(0,(int)0.9*m_height,m_width,(int)0.1*m_height);
+	rect2=cvRect(0,m_height-m_rheight,m_width,m_rheight);
 	line=288;
 	tmp_Onboard=0;
-
+///////V1.5.0////////////
+	m_bIn=false;
+	m_bOut=false;
+	m_iLineIn=50.0;
+	m_iLineOut=526.0;
+	m_bLineIn=false;
+	m_bLineOut=false;
+///////////////////////
 	framecnt=0;
 	high = 2000;
 	low = 1500;
@@ -200,7 +210,7 @@ int CVideoProc::Process(IplImage* image)
 	{
 		high=(high>objpix?high:objpix);
 	}
-	if(high-objpix>m_highlow && isin)//出去
+	if(high-objpix>m_highlow && isin&&destination[0].width>50)//出去
 	{
 		isin=FALSE;
 		cvSetImageROI(gray,rect1);
@@ -211,53 +221,61 @@ int CVideoProc::Process(IplImage* image)
 		cvResetImageROI(gray);
 		if(objforori2+objforori1>0)
 		{	
+#ifdef V1_4_0
 			m_iIn++;
 			Beep(440,25);
 			return 1;
+#endif
+#ifdef V1_5_0
+			m_bIn=true;
+#endif
 		}
 		else 
 		{	
+#ifdef V1_4_0
 			m_iOut++;
 			Beep(440,25);
 			return 2;
+#endif
+#ifdef V1_5_0
+			m_bOut=true;
+#endif
 		}
 	}
-
+#ifdef V1_5_0
+	if(((float)destination[0].y+(destination[0].height*0.5)-m_iLineIn)*((float)predestination[0].y+(predestination[0].height*0.5)-m_iLineIn)<0.00f)	
+	{
+		if(((float)destination[0].y+(destination[0].height*0.5)-m_iLineIn)<0.00f)
+		{
+			m_bLineIn=true;
+			if(m_bIn)
+			{
+				m_iIn++;
+				m_bLineIn=false;
+				m_bIn=false;
+				Beep(440,250);
+				return 1;
+			}
+		}
+	}	
+	if(((float)destination[0].y+(destination[0].height*0.5)-m_iLineOut)*((float)predestination[0].y+(predestination[0].height*0.5)-m_iLineOut)<0.00f)	
+	{
+		if(((float)destination[0].y+(destination[0].height*0.5)-m_iLineOut)>0.00f)
+		{
+			m_bLineOut=true;
+			if(m_bOut)
+			{
+				m_iOut++;
+				m_bLineOut=false;
+				m_bOut=false;
+				Beep(440,25);
+				return 2;
+			}
+		}
+	}	
+	predestination[0]=destination[0];
+#endif
 	return 0;
-
-	//if(((float)destination[0].y+(destination[0].height/2)-(float)line)*((float)predestination[0].y+(predestination[0].height/2)-(float)line)<0.00f)
-	//{
-	//	if(abs((float)destination[0].y+(destination[0].height/2)-(float)line)<100.0f&&abs((float)predestination[0].y+(predestination[0].height/2)-(float)line)<75.0f)
-	//	{
-	//		if((float)destination[0].y+(destination[0].height/2)-(float)line<0.00f) //下车
-	//		{
-	//			m_iOut++;
-	//			tmp_Onboard=m_iOnboard;
-	//			m_iOnboard--;
-	//			if(m_iOnboard<0) m_iOnboard=0;
-	//			predestination[0]=destination[0];
-	//			if(m_iOnboard==5) //到达目的地
-	//			{
-	//				return 3;
-	//			}
-	//			return 2;
-	//		}
-	//		else if((float)destination[0].y+(destination[0].height/2)-(float)line>0.00f) //上车
-	//			m_iIn++;
-	//		    tmp_Onboard=m_iOnboard;
-	//			m_iOnboard++;
-	//			predestination[0]=destination[0];
-	//			if(m_iOnboard==5) //开始
-	//			{
-	//				time_t t = time(0); 
-	//				strftime( start, sizeof(start), "%H:%M:%S",localtime(&t) ); 
-	//				puts( start ); 
-	//			}
-	//			return 1;
-	//	}
-	//	predestination[0]=destination[0];
-	//	return 0;
-	//}	
 }
 /************************************************************************/
 /* 在原有二值图的基础上找出 边缘轮廓 要预测     直接将预测的结果显示出来

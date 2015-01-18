@@ -46,5 +46,6 @@ private:
 	bool m_bStop;
 public:
 	afx_msg void OnBnClickedButton2();
+
 };
 

@@ -43,6 +43,7 @@ public:
 	int m_y;
 	int m_width;
 	int m_height;
+	int m_rheight;
 	/**人头检测方法*********************************************/
 	int nFrmNum;
 	CvRect rect1,rect2;
@@ -82,6 +83,14 @@ private:
 	int tmp_Onboard;
 	CvRect rect; //检测区
 	int line; //检测线
+///////V1.5.0///////////
+	bool m_bIn;
+	bool m_bOut;
+	float m_iLineIn;
+	float m_iLineOut;
+	bool m_bLineIn;
+	bool m_bLineOut;
+//////////////////////
 };
 extern CVideoProc* videoProc;
 

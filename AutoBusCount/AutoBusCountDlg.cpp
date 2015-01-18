@@ -262,7 +262,6 @@ BOOL CAutoBusCountDlg::OnInitDialog()
 
 	mysql_query(&myCont, "SET NAMES UTF8"); 
 	//::AfxMessageBox(connect);
-
 	SetTimer(1,80,TimerProc);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
