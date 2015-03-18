@@ -97,15 +97,19 @@ int CConGPS::DeleteLocationGPS(int i)
 {
 	vector<double> la;
 	vector<double> lo;
+	vector<char*> loca;
 	ifstream inFile(DATAFILE);
 	while(!inFile.eof()){
 		double _la,_lo;
+		char* _location=new char[20];
 		inFile>>_la>>_lo;
 		la.push_back(_la);
 		lo.push_back(_lo);
+		loca.push_back(_location);
 	}
 	la.erase(la.begin()+i);
 	lo.erase(lo.begin()+i);
+	loca.erase(loca.begin()+i);
 	inFile.close();
 	ofstream outfile(DATAFILE,ios::out);
 	if(!outfile)
@@ -114,7 +118,7 @@ int CConGPS::DeleteLocationGPS(int i)
 	}
 	for(int i=0;i<la.size();i++)
 	{
-		outfile<<la[i]<<" "<<lo[i];
+		outfile<<la[i]<<" "<<lo[i]<<" "<<loca[i];
 	}
 	outfile.close();
 	return 1;
@@ -184,16 +188,41 @@ int CConGPS::CompareLocation(char** location)
 				if(abs(latitude-g_latitude[i])<RADIU && abs(longitude-g_longitude[i])<RADIU)
 				{
 					cout<<"location get!"<<endl;
-					*location=g_location[i];
+					if(location!=NULL)
+					{
+						*location=g_location[i];
+					}
 					return 1;
 				}
 				else
 					cout<<"location not get!"<<endl;
 			}
 		}
-		sleep(2);
+		//sleep(1);
 		return 0;
 	}
 }
+
+int CConGPS::ComfirmArrive()
+{
+	int arr=0;
+	for(int i=0;i<10;i++)
+	{
+		if(CompareLocation())
+		{
+			arr++;
+		}
+	}
+	if(arr>5)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+
 
 

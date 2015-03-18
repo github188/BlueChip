@@ -29,7 +29,7 @@ class CConGPS
 	public:
 		CConGPS();
 		~CConGPS();
-		/*******Setting GPS Data***********************************/
+		/*******Setting GPS Data*******************************************************/
 		/* Getting GPS data
 		 * @return 1: data available
 		 * @return 0: data not availabe*/
@@ -41,12 +41,13 @@ class CConGPS
 		int DeleteLocationGPS(int i);
 		/* clear all data and reset new ones */
 		int Reset();
-		/*******Main Funtion***********************************/
+		/*******Main Funtion************************************************************/
 		/* compare the current location with the setting location
 		 * @return 1: compare match
 		 * @return 0: compare not match
 		 * @return location:*/
-		int CompareLocation(char** location);
+		int CompareLocation(char** location=NULL);
+		int ComfirmArrive();
 	protected:
 		int Init();
 	private:
