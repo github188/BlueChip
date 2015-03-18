@@ -27,18 +27,20 @@
 #include <termios.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <fstream>
+#include <string>
 
 #include "tool/evgetgps.hpp"
 using namespace std; 
 
 #define DATAFILE "../data/locations.dat"
-#define RADIU 0.0001
+#define RADIU 0.005 //about 500 meters
 
 CConGPS::CConGPS()
 {
 	getGPS=new EVGetGPS;
-	latitude=0.00f;
-	longitude=0.00f;
+	latitude=0.000000;
+	longitude=0.000000;
 	m_init=false;
 }
 
@@ -66,6 +68,7 @@ int CConGPS::Process()
 			{
 				latitude=getGPS->get_latitude();
 				longitude=getGPS->get_longitude();
+				cout<<latitude<<" "<<longitude<<endl;
 				done=true;
 			}
 		}
@@ -119,7 +122,7 @@ int CConGPS::DeleteLocationGPS(int i)
 
 int CConGPS::Reset()
 {
-	ofstream outfile(file,ios::out);
+	ofstream outfile(DATAFILE,ios::out);
 	if(!outfile)
 	{
 		return 0;
@@ -130,14 +133,15 @@ int CConGPS::Reset()
 
 int CConGPS::Init()
 {
-	ifstream inFile(DATAFILE);
+	ifstream inFile(DATAFILE,ios::in);
 	while(!inFile.eof()){
 		double _la,_lo;
-		char* _location;
+		char* _location=new char[20];
 		inFile>>_la>>_lo>>_location;
 		g_latitude.push_back(_la);
 		g_longitude.push_back(_lo);
 		g_location.push_back(_location);
+		//delete _location;
 	}
 	inFile.close();
 	m_init=true;
@@ -145,10 +149,19 @@ int CConGPS::Init()
 	{
 		return 0;
 	}
+	for(int i=0;i<g_latitude.size()-1;i++)
+	{
+		cout<<g_latitude[i]<<" "<<g_longitude[i]<<" "<<g_location[i]<<endl;
+	}
+	if(getGPS->initGpsDev()==-1)
+	{
+		cout<<"init failed !"<<endl;
+		return 0;
+	}
 	return 1;
 }
 
-int CConGPS::CompareLocation(char* location)
+int CConGPS::CompareLocation(char** location)
 {
 	if(!m_init)
 	{
@@ -165,16 +178,20 @@ int CConGPS::CompareLocation(char* location)
 		{
 			latitude=getGPS->get_latitude();
 			longitude=getGPS->get_longitude();
-			done=true;
-		}
-		for(int i=0;i<g_latitude.size();i++)
-		{	
-			if(abs(latitude-g_latitude[i])<RADIU && abs(longitude-g_longitude[i])<RADIU)
-			{
-				location=g_location[i];
-				return 1;
+		
+			for(int i=0;i<g_latitude.size()-1;i++)
+			{	
+				if(abs(latitude-g_latitude[i])<RADIU && abs(longitude-g_longitude[i])<RADIU)
+				{
+					cout<<"location get!"<<endl;
+					*location=g_location[i];
+					return 1;
+				}
+				else
+					cout<<"location not get!"<<endl;
 			}
 		}
+		sleep(2);
 		return 0;
 	}
 }

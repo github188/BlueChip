@@ -46,7 +46,7 @@ class CConGPS
 		 * @return 1: compare match
 		 * @return 0: compare not match
 		 * @return location:*/
-		int CompareLocation(char* location=NULL);
+		int CompareLocation(char** location);
 	protected:
 		int Init();
 	private:
@@ -57,6 +57,7 @@ class CConGPS
 		vector<double> g_longitude;
 		vector<char*> g_location;
 		bool m_init;
+
 };
 
 #endif

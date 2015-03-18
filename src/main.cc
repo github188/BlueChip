@@ -19,20 +19,55 @@
 #include "ConGPS.hpp"
 
 #include <stdio.h>
+#include <unistd.h>
 #include <pthread.h>
 
-int main()
+using namespace std;
+
+void* thread_gps(void* ptr)
 {
 	CConGPS* conGPS=new CConGPS();
-	char* current_location;
+	//conGPS->Process();
+	char** current_location;
+	*current_location=new char[20];
 	while(1)
 	{
+		cout<<"This is a pthread."<<endl;
 		if(conGPS->CompareLocation(current_location))
 		{
-			cout<<current_location<<endl;
+			cout<<*current_location<<endl;
+			return 0;
 		}
+	}
+	delete current_location;
+	delete conGPS;
+}
+
+void* thread(void* ptr)
+{
+	for(int i=0;i<3;i++)
+	{
+		sleep(1);
+		cout<<"This is a pthread."<<endl;
 	}
 	return 0;
 }
 
+int main()
+{
+	pthread_t id;
+	int ret = pthread_create(&id,NULL,thread_gps,NULL);
+	if(ret)
+	{
+		cout<<"create pthread error!"<<endl;
+		return 1;
+	}
+	/*for(int i=0;i<3;i++)
+	{
+		cout<<"This is the main process."<<endl;
+		sleep(1);
+	}*/
+	pthread_join(id,NULL);
+	return 0;
+}
 
