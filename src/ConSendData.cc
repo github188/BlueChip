@@ -2,6 +2,8 @@
 
 #define DATABASE_FILE "../data/database.dat"
 #define BUSID_FILE "../data/busid.dat"
+#define WAITING_FILE "../data/waitinglist.dat"
+#define DATA_FILE "../data/data.dat"
 
 CConSendData::CConSendData()
 {
@@ -10,12 +12,18 @@ CConSendData::CConSendData()
 	db_pswd=new char[20];
 	db_name=new char[20];
 	evMySql=new EVMySql();
+	db_init=false;
 	Init();
 	last_num=0;
 }
 
 CConSendData::~CConSendData()
 {
+	delete db_addr;
+	delete db_user;
+	delete db_pswd;
+	delete db_name;
+	delete evMySql;
 }
 
 int CConSendData::SendArriveSignal(char* des)
@@ -39,25 +47,19 @@ int CConSendData::GetData(int in,int out)
 {
 	int num=in-(out-last_num);
 	last_num=num;
-	if(CheckNetwork())
-	{
-		SendData();
-	}
-	else
-	{
-  		//TODO:save to waiting list
-	}
+	SendData();
 	return 0;
 }
 
 int CConSendData::Init()
 {
+	/* get database information */
 	ifstream inFile(DATABASE_FILE);
 	while(!inFile.eof()){
 		inFile>>db_addr>>db_user>>db_pswd>>db_name>>port;
 	}
 	inFile.close();
-	evMySql->Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port,NULL,0);
+	/* Get bus id */
 	ifstream inFile(BUSID_FILE);
 	char* _busid=new char[30];
 	while(!inFile.eof()){
@@ -65,24 +67,40 @@ int CConSendData::Init()
 	}
 	busid=_busid;
 	inFile.close();
+	/* Get date */
 	char tmp_date[64];
 	time_t=time(0);
 	strftime(tmp_date,sizeof(tmp_date),"%Y-%m-%d",localtime(&t));
 	puts(tmp_date);
 	current_date=tmp_date;
-	return 0;
-}
-
-int CConSendData::CheckNetwork()
-{
-	//TODO: 
-	return 1; //network access
+	/* init database connection */
+	if(!evMySql->Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port,NULL,0));
+	{
+		perror("Fail to connet to database!\n");
+		return 0;
+	}
+	db_init=true;
+	return 1;
 }
 
 int CConSendData::SendData()
 {
-	//TODO:Send waiting list
-
+	if(ReadWaitingList()&&waiting_list.size()>0)
+	{
+		vector<char*>::iterator it=waiting_list.begin();
+		while(it!=waiting_list.end())
+		{
+			if(mySql->Insert(*it))
+			{
+				it->erase(it);
+			}
+			else
+			{
+				SaveToWaitingList(*it);
+				++it;
+			}
+		}
+	}
 	char c_num[10];
 	sprintf(c_num,"%d",num);
 	string sql;
@@ -104,12 +122,28 @@ int CConSendData::SendData()
 	sql+="',";
 	sql+=c_num;
 	sql+=")";
-	cout<<sql.data()<<endl;
-	if(!mySql->Insert(sql.data()));
+	SaveToLocal(busid,current_date,current_dep_time,current_des_time,current_duration,current_departure,current_destination,c_num);
+	//cout<<sql.data()<<endl;
+	if(db_init)
 	{
+		if(!mySql->Insert(sql.data()));
+		{
+			SaveToWaitingList(sql.data());
+			return 0;
+		}
+		return 1;
+	}
+	else
+	{
+		SaveToWaitingList(sql.data());
+		if(!evMySql->Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port,NULL,0))
+		{
+			perror("Fail to connet to database!\n");
+			return 0;
+		}
+		db_init=true;
 		return 0;
 	}
-	return 0;
 }
 
 string CConSendData::delta_time(const char* src_starttime,const char* src_arrivetime)
@@ -155,4 +189,66 @@ string CConSendData::delta_time(const char* src_starttime,const char* src_arrive
 	duration += ":";
 	duration += s;
 	return duration;
+}
+
+int CConSendData::SaveToWaitingList(char* sql)
+{
+	ofstream outfile(WAITING_FILE,ios::app);
+	if(!outfile)
+	{
+		perror("Fail to open waiting list!\n");
+		return 0;
+	}
+	outfile<<sql;
+	outfile.close();
+	return 1;
+}
+
+int CConSendData::ReadWaitingList()
+{
+	FILE *fp;
+	char* sqlline=new char(1024);
+	if((fp=fopen(WAITING_FILE,"r"))==NULL)
+	{
+		perror("Fail to read waiting file.\n");
+		return 0;
+	}
+	waiting_list.clear();
+	while(!feof(fp))
+	{
+		fgets(sqlline,1024,fp);
+		waiting_list.push_back(sqlline);
+	}
+	fclose(fp);
+	return 1;	
+}
+
+int CConSendData::SaveToLocal(string busid,string current_date,string current_dep_time,sting current_des_time,string current_duration,string current_departure,string current_destination,string c_num)
+{
+	string data;
+	data += busid;
+	data += " ";
+	data += current_date;
+	data += " ";
+	data += current_dep_time;
+	data += " ";
+	data += current_des_time;
+	data += " ";
+	data += current_duration;
+	data += " ";
+	data += current_departure;
+	data += " ";
+	data += current_destination;
+	data += " ";
+	data += c_num;
+	
+	ofstream outfile(DATA_FILE,ios::app);
+	if(!outfile)
+	{
+		perror("Fail to open data.dat!\n");
+		return 0;
+	}
+	outfile<<data.data();
+	outfile.close();
+	return 1;
 }
