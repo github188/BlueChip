@@ -45,7 +45,7 @@ int CConSendData::SendLeaveSignal(char* dep)
 
 int CConSendData::GetData(int in,int out)
 {
-	int num=in-(out-last_num);
+	num=in-(out-last_num);
 	last_num=num;
 	SendData();
 	return 0;
