@@ -29,17 +29,17 @@ CConSendData::~CConSendData()
 int CConSendData::SendArriveSignal(char* des)
 {
 	current_destination=des;
-	time_t=time(0);
-	strftime(current_des_time,64,"%H-%M-%S",localtime(&t));
-	current_duration=delta_time(current_dep_time,current_des_time);
+	time_t t=time(0);
+	strftime((char*)current_des_time.data(),64,"%H-%M-%S",localtime(&t));
+	current_duration=delta_time(current_dep_time.data(),current_des_time.data());
 	return 0;
 }
 
 int CConSendData::SendLeaveSignal(char* dep)
 {
-	current_departure=des;
-	time_t=time(0);
-	strftime(current_dep_time,64,"%H-%M-%S",localtime(&t));
+	current_departure=dep;
+	time_t t=time(0);
+	strftime((char*)current_dep_time.data(),64,"%H-%M-%S",localtime(&t));
 	return 0;
 }
 
@@ -60,7 +60,7 @@ int CConSendData::Init()
 	}
 	inFile.close();
 	/* Get bus id */
-	ifstream inFile(BUSID_FILE);
+	inFile.open(BUSID_FILE);
 	char* _busid=new char[30];
 	while(!inFile.eof()){
 		inFile>>_busid;
@@ -69,12 +69,12 @@ int CConSendData::Init()
 	inFile.close();
 	/* Get date */
 	char tmp_date[64];
-	time_t=time(0);
+	time_t t=time(0);
 	strftime(tmp_date,sizeof(tmp_date),"%Y-%m-%d",localtime(&t));
 	puts(tmp_date);
 	current_date=tmp_date;
 	/* init database connection */
-	if(!evMySql->Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port,NULL,0));
+	if(!evMySql->Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port));
 	{
 		perror("Fail to connet to database!\n");
 		return 0;
@@ -90,9 +90,9 @@ int CConSendData::SendData()
 		vector<char*>::iterator it=waiting_list.begin();
 		while(it!=waiting_list.end())
 		{
-			if(mySql->Insert(*it))
+			if(evMySql->Insert(*it))
 			{
-				it->erase(it);
+				it=waiting_list.erase(it);
 			}
 			else
 			{
@@ -110,7 +110,7 @@ int CConSendData::SendData()
 	sql+="','";
 	sql+=current_date;
 	sql+="','";
-	sql+=curent_dep_time;
+	sql+=current_dep_time;
 	sql+="','";
 	sql+=current_des_time;
 	sql+="','";
@@ -126,17 +126,17 @@ int CConSendData::SendData()
 	//cout<<sql.data()<<endl;
 	if(db_init)
 	{
-		if(!mySql->Insert(sql.data()));
+		if(!evMySql->Insert(sql.data()));
 		{
-			SaveToWaitingList(sql.data());
+			SaveToWaitingList((char*)sql.data());
 			return 0;
 		}
 		return 1;
 	}
 	else
 	{
-		SaveToWaitingList(sql.data());
-		if(!evMySql->Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port,NULL,0))
+		SaveToWaitingList((char*)sql.data());
+		if(!evMySql->Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port))
 		{
 			perror("Fail to connet to database!\n");
 			return 0;
@@ -207,7 +207,7 @@ int CConSendData::SaveToWaitingList(char* sql)
 int CConSendData::ReadWaitingList()
 {
 	FILE *fp;
-	char* sqlline=new char(1024);
+	char* sqlline=new char[1024];
 	if((fp=fopen(WAITING_FILE,"r"))==NULL)
 	{
 		perror("Fail to read waiting file.\n");
@@ -223,7 +223,7 @@ int CConSendData::ReadWaitingList()
 	return 1;	
 }
 
-int CConSendData::SaveToLocal(string busid,string current_date,string current_dep_time,sting current_des_time,string current_duration,string current_departure,string current_destination,string c_num)
+int CConSendData::SaveToLocal(string busid,string current_date,string current_dep_time,string current_des_time,string current_duration,string current_departure,string current_destination,string c_num)
 {
 	string data;
 	data += busid;

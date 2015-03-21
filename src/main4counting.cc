@@ -41,7 +41,7 @@ int main()
 		usbStream->setSize(480,720);
 		int fd;
 		fd=usbStream->open_camer_device();
-		usbSteam->init_camer_device(fd);
+		usbStream->init_camer_device(fd);
 		/* init counting */
 		EVCountWithDirect* countWithDirect=new EVCountWithDirect();
 		/* init send data */
@@ -68,24 +68,22 @@ int main()
 		bool arrive=false;
 		while(running)
 		{
-				if(share->written)
+				if(shared->written)
 				{
 						if(!arrive)
 						{
-							arrive=true;
 							//arrive
-							conSendData->SendArriveSignal(*current_location);
+							arrive=true;
+							conSendData->SendArriveSignal(shared->text);
 						}
-						else
-						{
-							int ret=countWithDirect->Process(usbStream->GetImage(fd));
-						}
+						int ret=countWithDirect->Process(usbStream->GetImage(fd));
 				}
-				else if(!share->written&&arrive)
+				else if(!shared->written&&arrive)
 				{
 						//left
+						arrive=false;
 						countWithDirect->Zero();
-						conSendData->SendLeaveSignal(*current_location);
+						conSendData->SendLeaveSignal(shared->text);
 				}
 				else
 						sleep(1);
