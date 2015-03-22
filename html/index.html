@@ -1,0 +1,25 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>Control Center</title>
+ </head>
+ <body>
+  <div style="font-weight:bold;font-size:20px">GPS Setting</div>
+  <form method="post" action="/cgi-bin/postGPS.cgi">
+  <div style="font-weight:bold;">Add Location</div>
+  <div>Location:
+  <input type="text" width=100 name="location"/>
+  <button type="submit" value="resu">Add</button>
+  </div>
+  </form>
+  <form method="post" action="/cgi-bin/delGPS.cgi">
+  <div style="font-weight:bold;">Delete Location</div>
+  <div>ID:
+  <input type="text" width=100 name="id" />
+  <button type="submit" value="resu2">Delete</button>
+  </div>
+  </form>
+  <div><a href="/cgi-bin/resetGPS.cgi"><button>Reset</button></a></div>
+
+ </body>
+</html>
