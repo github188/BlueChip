@@ -33,7 +33,7 @@
 #include "tool/evgetgps.hpp"
 using namespace std; 
 
-#define DATAFILE "../data/locations.dat"
+#define DATAFILE "/root/Project_Master_Macau_System/data/locations.dat"
 #define RADIU 0.005 //about 500 meters
 
 CConGPS::CConGPS()
@@ -53,7 +53,7 @@ int CConGPS::Process()
 {
 	if(getGPS->initGpsDev()==-1)
 	{
-		cout<<"init failed !"<<endl;
+	//	cout<<"init failed !"<<endl;
 		return 0;
 	}
 	bool done=false;
@@ -68,7 +68,7 @@ int CConGPS::Process()
 			{
 				latitude=getGPS->get_latitude();
 				longitude=getGPS->get_longitude();
-				cout<<latitude<<" "<<longitude<<endl;
+				//cout<<latitude<<" "<<longitude<<endl;
 				done=true;
 			}
 		}
@@ -81,14 +81,19 @@ int CConGPS::Process()
 	return 1;
 }
 
-int CConGPS::AddLocationGPS()
+int CConGPS::AddLocationGPS(char* location)
 {
 	ofstream outfile(DATAFILE,ios::app);
 	if(!outfile)
 	{
-		return 0;
+			printf("Content-Type:text/html/\n\n");
+			printf("no data file found.\n");
+			printf("%s\n",DATAFILE);
+			return 0;
 	}
-	outfile<<latitude<<" "<<longitude;
+	outfile<<latitude<<" "<<longitude<<" "<<location<<endl;
+	printf("Content-Type:text/html/\n\n");
+	printf("latitude:%lf,longitude:%lf\n",latitude,longitude);
 	outfile.close();
 	return 1;
 }
@@ -101,8 +106,8 @@ int CConGPS::DeleteLocationGPS(int i)
 	ifstream inFile(DATAFILE);
 	while(!inFile.eof()){
 		double _la,_lo;
-		char* _location=new char[20];
-		inFile>>_la>>_lo;
+		char* _location=new char[100];
+		inFile>>_la>>_lo>>_location;
 		la.push_back(_la);
 		lo.push_back(_lo);
 		loca.push_back(_location);
@@ -116,9 +121,9 @@ int CConGPS::DeleteLocationGPS(int i)
 	{
 		return 0;
 	}
-	for(int i=0;i<la.size();i++)
+	for(int i=0;i<la.size()-1;i++)
 	{
-		outfile<<la[i]<<" "<<lo[i]<<" "<<loca[i];
+		outfile<<la[i]<<" "<<lo[i]<<" "<<loca[i]<<endl;
 	}
 	outfile.close();
 	return 1;
@@ -155,11 +160,11 @@ int CConGPS::Init()
 	}
 	for(int i=0;i<g_latitude.size()-1;i++)
 	{
-		cout<<g_latitude[i]<<" "<<g_longitude[i]<<" "<<g_location[i]<<endl;
+		//cout<<g_latitude[i]<<" "<<g_longitude[i]<<" "<<g_location[i]<<endl;
 	}
 	if(getGPS->initGpsDev()==-1)
 	{
-		cout<<"init failed !"<<endl;
+		//cout<<"init failed !"<<endl;
 		return 0;
 	}
 	return 1;

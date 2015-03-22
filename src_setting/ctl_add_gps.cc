@@ -18,12 +18,12 @@
 
 #include "ConGPS.hpp"
 
-int main()
+int main(int argc,char* argv[])
 {
 	CConGPS* conGPS=new CConGPS();
 	if(conGPS->Process())
 	{
-		conGPS->AddLocationGPS();
+		conGPS->AddLocationGPS(argv[1]);
 	}
 	delete conGPS;
 	return 0;

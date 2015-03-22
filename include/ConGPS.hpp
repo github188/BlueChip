@@ -35,7 +35,7 @@ class CConGPS
 		 * @return 0: data not availabe*/
 		int Process();
 		/* add a new lacation's gps data in the file */
-		int AddLocationGPS();
+		int AddLocationGPS(char* location);
 		/* delete a specific data in the data file
 		 * @param i: the i row in the data which would be delete */
 		int DeleteLocationGPS(int i);
