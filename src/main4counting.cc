@@ -32,9 +32,9 @@
 
 using namespace std;
 
-int main()
+int main(int argc,char* argv[])
 {
-		sleep(100);
+		//sleep(10);
 		/* init video device */
 		EVUsbStream* usbStream=new EVUsbStream();
 		usbStream->set_device(VIDEO_DEVICE);
@@ -42,6 +42,7 @@ int main()
 		int fd;
 		fd=usbStream->open_camer_device();
 		usbStream->init_camer_device(fd);
+                usbStream->start_capturing(fd);
 		/* init counting */
 		EVCountWithDirect* countWithDirect=new EVCountWithDirect();
 		/* init send data */
@@ -68,25 +69,43 @@ int main()
 		bool arrive=false;
 		while(running)
 		{
+                                IplImage* input_image=usbStream->GetImage(fd);
 				if(shared->written)
 				{
 						if(!arrive)
 						{
-							//arrive
+							//arrived
 							arrive=true;
 							conSendData->SendArriveSignal(shared->text);
+                                                        conSendData->GetData(countWithDirect->GetUpNum(),countWithDirect->GetDownNum());
+                                                        countWithDirect->Zero();
 						}
-						int ret=countWithDirect->Process(usbStream->GetImage(fd));
+						int ret=countWithDirect->Process(input_image);  
+                                                if(ret>0)
+                                                {
+                                                        cout<<ret<<endl;
+                                                }        
+                                                /*cvNamedWindow("Input_Image",1);
+		                                cvShowImage("Input_Image",input_image);
+		                                if(cvWaitKey(1)==27)
+		                                {
+                                                        cout<<"leave signal..."<<endl;
+                                                        conSendData->SendLeaveSignal(shared->text);
+                                                        conSendData->GetData(countWithDirect->GetUpNum(),countWithDirect->GetDownNum());
+		                                }*/
+
 				}
 				else if(!shared->written&&arrive)
 				{
 						//left
 						arrive=false;
-						countWithDirect->Zero();
 						conSendData->SendLeaveSignal(shared->text);
 				}
 				else
+                                {
 						sleep(1);
+                                }
+                                cvReleaseImage(&input_image);
 		}
 		if(shmdt(shm)==-1)
 		{

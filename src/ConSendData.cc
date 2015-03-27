@@ -15,6 +15,9 @@ CConSendData::CConSendData()
 	db_init=false;
 	Init();
 	last_num=0;
+        current_dep_time="00:00:00";
+        current_des_time="00:00:00";
+        current_duration="00:00:00";
 }
 
 CConSendData::~CConSendData()
@@ -29,25 +32,38 @@ CConSendData::~CConSendData()
 int CConSendData::SendArriveSignal(char* des)
 {
 	current_destination=des;
+        char tmp_arrivetime[64];
 	time_t t=time(0);
-	strftime((char*)current_des_time.data(),64,"%H-%M-%S",localtime(&t));
-	current_duration=delta_time(current_dep_time.data(),current_des_time.data());
-	return 0;
+	strftime(tmp_arrivetime,sizeof(tmp_arrivetime),"%H:%M:%S",localtime(&t));
+        current_des_time=tmp_arrivetime;
+        if(current_dep_time!="00:00:00" && current_des_time!="00:00:00")
+        {
+	       current_duration=delta_time(current_dep_time.data(),current_des_time.data());
+	}
+        return 0;
 }
 
 int CConSendData::SendLeaveSignal(char* dep)
 {
 	current_departure=dep;
+        char tmp_arrivetime[64];
 	time_t t=time(0);
-	strftime((char*)current_dep_time.data(),64,"%H-%M-%S",localtime(&t));
+	strftime(tmp_arrivetime,sizeof(tmp_arrivetime),"%H:%M:%S",localtime(&t));
+        current_dep_time=tmp_arrivetime;
+        //current_duration=delta_time(current_des_time.data(),current_dep_time.data());
 	return 0;
 }
 
 int CConSendData::GetData(int in,int out)
 {
-	num=in-(out-last_num);
+	num=in+out;
+        if(num>55){num=55;}
+        if(num<0){num=0;}
 	last_num=num;
-	SendData();
+        if(current_dep_time!="00:00:00" && current_des_time!="00:00:00")
+        {
+	       SendData();
+        }
 	return 0;
 }
 
@@ -74,9 +90,9 @@ int CConSendData::Init()
 	puts(tmp_date);
 	current_date=tmp_date;
 	/* init database connection */
-	if(!evMySql->Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port));
+	if(!evMySql->Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port))
 	{
-		perror("Fail to connet to database!\n");
+		printf("Success to connet to database!\n");
 		return 0;
 	}
 	db_init=true;
@@ -178,11 +194,11 @@ string CConSendData::delta_time(const char* src_starttime,const char* src_arrive
 	int minite=floor((delta%3600)/60);
 	int second=delta-hour*3600-minite*60;
 	char h[10];
-	sprintf(h,"%d",hour);
+	//sprintf(h,"%d",hour);
 	char m[10];
-	sprintf(m,"%d",minite);
+	//sprintf(m,"%d",minite);
 	char s[10];
-	sprintf(s,"%d",second);
+	//sprintf(s,"%d",second);
 	string duration=h;
 	duration += ":";
 	duration += m;
@@ -199,7 +215,7 @@ int CConSendData::SaveToWaitingList(char* sql)
 		perror("Fail to open waiting list!\n");
 		return 0;
 	}
-	outfile<<sql;
+	outfile<<sql<<endl;
 	outfile.close();
 	return 1;
 }
@@ -248,7 +264,7 @@ int CConSendData::SaveToLocal(string busid,string current_date,string current_de
 		perror("Fail to open data.dat!\n");
 		return 0;
 	}
-	outfile<<data.data();
+	outfile<<data.data()<<endl;
 	outfile.close();
 	return 1;
 }
