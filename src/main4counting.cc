@@ -81,18 +81,23 @@ int main(int argc,char* argv[])
                                                         countWithDirect->Zero();
 						}
 						int ret=countWithDirect->Process(input_image);  
-                                                if(ret>0)
-                                                {
-                                                        cout<<ret<<endl;
-                                                }        
-                                                /*cvNamedWindow("Input_Image",1);
+                                                    
+                                                cvNamedWindow("Input_Image",1);
 		                                cvShowImage("Input_Image",input_image);
-		                                if(cvWaitKey(1)==27)
+                                                int key=cvWaitKey(1);
+		                                if(key==27)
 		                                {
                                                         cout<<"leave signal..."<<endl;
                                                         conSendData->SendLeaveSignal(shared->text);
+                                                        //conSendData->GetData(countWithDirect->GetUpNum(),countWithDirect->GetDownNum());
+		                                }
+                                                if(key=='c')
+		                                {
+                                                        cout<<"arrive signal..."<<endl;
+                                                        conSendData->SendArriveSignal(shared->text);
                                                         conSendData->GetData(countWithDirect->GetUpNum(),countWithDirect->GetDownNum());
-		                                }*/
+                                                        countWithDirect->Zero();
+		                                }
 
 				}
 				else if(!shared->written&&arrive)

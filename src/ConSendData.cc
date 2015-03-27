@@ -142,7 +142,7 @@ int CConSendData::SendData()
 	//cout<<sql.data()<<endl;
 	if(db_init)
 	{
-		if(!evMySql->Insert(sql.data()));
+		if(!evMySql->Insert(sql.data()))
 		{
 			SaveToWaitingList((char*)sql.data());
 			return 0;
@@ -175,7 +175,7 @@ string CConSendData::delta_time(const char* src_starttime,const char* src_arrive
 	{
 	int n=atoi(p);
 	start.push_back(n);
-	printf("%d\n",n);
+	//printf("%d\n",n);
 	p=strtok(NULL,d);
 	}
 	vector<int> arrive;
@@ -184,7 +184,7 @@ string CConSendData::delta_time(const char* src_starttime,const char* src_arrive
 	{
 	int m=atoi(q);
 	arrive.push_back(m);
-	printf("%d\n",m);
+	//printf("%d\n",m);
 	q=strtok(NULL,d);
 	}
 	int starttime_second=start[0]*3600+start[1]*60+start[2];
@@ -233,9 +233,14 @@ int CConSendData::ReadWaitingList()
 	while(!feof(fp))
 	{
 		fgets(sqlline,1024,fp);
-		waiting_list.push_back(sqlline);
+                if(sqlline[0]!='\n')
+                {
+		     waiting_list.push_back(sqlline);
+                }
 	}
 	fclose(fp);
+        ofstream outfile(WAITING_FILE,ios::out);
+        outfile.close();
 	return 1;	
 }
 
