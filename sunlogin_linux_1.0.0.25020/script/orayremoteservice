@@ -1,0 +1,60 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          orayremoteservice
+# Short-Description: orayremoteservice
+# Description:       Oray Remote Service
+### END INIT INFO
+
+DAEMON=/usr/local/sunlogin/bin/oraysunloginservice
+DAEMON_CONF=/etc/orayremoteclient.conf
+DESC="Oray Remote Service"
+NAME="orayremoteservice"
+
+start()
+{
+    echo -n "start orayremoteservice"
+    while read line;do
+    eval "$line"
+    done < $DAEMON_CONF
+    if [ "$sunlogincode" = "" ]; 
+         then
+	 echo  " You can run /usr/local/sunlogin/bin/oraysunloginservice -reset to write the config [failed]"
+    else
+	 $DAEMON -d
+	 echo  "              [ok]"
+    fi
+    exit 0;
+}
+stop()
+{
+
+    echo -n "stop orayremoteservice"
+    if killall $DAEMON
+        then
+        rm /tmp/proc_oray_save.pid -f
+        echo  "              [ok]"
+
+    else
+
+        echo  "              [failed]"
+
+    fi
+
+}
+
+case "$1" in
+start)
+    start
+    ;;
+stop)
+    stop
+    ;;
+restart)
+    stop
+    start
+    ;;
+*)
+    echo "usage: $0 start|stop|restart"
+    exit 0;
+esac

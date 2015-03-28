@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>ssh</title>
+<link href="https://remote.oray.com/favicon.ico" rel="shortcut icon" />
+<link href="https://remote.oray.com/html/themes/default/style-1.0.5.css" rel="stylesheet" type="text/css" />
+<link href="https://remote.oray.com/html/themes/black/style-1.0.1.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="https://remote.oray.com/html/js/ext-min-1.js"></script>
+<script type="text/javascript" src="https://remote.oray.com/html/js/ext-min-2.js"></script>
+<script type="text/javascript" src="https://remote.oray.com/html/js/lang-en.js?v3.5.25"></script>
+<script type="text/javascript" src="https://remote.oray.com/html/js/connector-3.5.25.js"></script>
+<script type="text/javascript" src="https://remote.oray.com/html/js/plugins-3.5.25.js"></script>
+<style type="text/css">
+html{ height:100%;}
+body{padding:0;background-color:#000;height:100%;}
+</style>
+</head>
+<body>
+<script type="text/javascript">
+
+var params = Ext.urlDecode(location.search.replace(/^\?/, ''));
+var connector = new Connector({params: params});
+var plugin = new Plugin('putty', {lang:'en'});
+
+if (!plugin.enabled) {
+	location = "https://remote.oray.com/html/v3.5.25/en-activex.html#putty";
+}
+//plugin.object.focus();
+
+connector.connect(plugin);
+
+window.onload = function() {
+
+plugin.object.focus();
+
+}
+
+</script>
+</body>
+</html>
