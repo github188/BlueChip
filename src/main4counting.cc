@@ -74,6 +74,7 @@ int main(int argc,char* argv[])
 				{
 						if(!arrive)
 						{
+							cout<<"Arrive Signal..."<<endl;
 							//arrived
 							arrive=true;
 							conSendData->SendArriveSignal(shared->text);
@@ -81,7 +82,7 @@ int main(int argc,char* argv[])
                                                         countWithDirect->Zero();
 						}
 						int ret=countWithDirect->Process(input_image);  
-                                                    
+                                                /* For test */    
                                                 cvNamedWindow("Input_Image",1);
 		                                cvShowImage("Input_Image",input_image);
                                                 int key=cvWaitKey(1);
@@ -98,11 +99,13 @@ int main(int argc,char* argv[])
                                                         conSendData->GetData(countWithDirect->GetUpNum(),countWithDirect->GetDownNum());
                                                         countWithDirect->Zero();
 		                                }
+						/* For test end  */
 
 				}
 				else if(!shared->written&&arrive)
 				{
 						//left
+						cout<<"Leave Signal..."<<endl;
 						arrive=false;
 						conSendData->SendLeaveSignal(shared->text);
 				}

@@ -140,7 +140,7 @@ int CConSendData::SendData()
 	sql+=")";
 	SaveToLocal(busid,current_date,current_dep_time,current_des_time,current_duration,current_departure,current_destination,c_num);
 	//cout<<sql.data()<<endl;
-	if(db_init)
+	if(db_init&&current_duration!="00:00:00")
 	{
 		if(!evMySql->Insert(sql.data()))
 		{
@@ -194,16 +194,20 @@ string CConSendData::delta_time(const char* src_starttime,const char* src_arrive
 	int minite=floor((delta%3600)/60);
 	int second=delta-hour*3600-minite*60;
 	char h[10];
-	//sprintf(h,"%d",hour);
+	sprintf(h,"%d",hour);
 	char m[10];
-	//sprintf(m,"%d",minite);
+	sprintf(m,"%d",minite);
 	char s[10];
-	//sprintf(s,"%d",second);
+	sprintf(s,"%d",second);
 	string duration=h;
 	duration += ":";
 	duration += m;
 	duration += ":";
 	duration += s;
+	if(hour==0&&minite<5)
+	{
+		duration="00:00:00";	
+	}
 	return duration;
 }
 
