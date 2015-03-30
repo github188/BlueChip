@@ -4,6 +4,7 @@
 #define BUSID_FILE "../data/busid.dat"
 #define WAITING_FILE "../data/waitinglist.dat"
 #define DATA_FILE "../data/data.dat"
+#define MAX_PASSAGER 37
 
 CConSendData::CConSendData()
 {
@@ -56,8 +57,8 @@ int CConSendData::SendLeaveSignal(char* dep)
 
 int CConSendData::GetData(int in,int out)
 {
-	num=in+out;
-        if(num>55){num=55;}
+	num=in;
+        if(num>37){num=37;}
         if(num<0){num=0;}
 	last_num=num;
         if(current_dep_time!="00:00:00" && current_des_time!="00:00:00")

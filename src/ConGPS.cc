@@ -34,7 +34,7 @@
 using namespace std; 
 
 #define DATAFILE "/root/Project_Master_Macau_System/data/locations.dat"
-#define RADIU 0.005 //about 500 meters
+#define RADIU 0.001 //about 500 meters
 
 CConGPS::CConGPS()
 {
@@ -57,7 +57,7 @@ int CConGPS::Process()
 		return 0;
 	}
 	bool done=false;
-	int cnt=10;
+	int cnt=1;
 	while(!done)
 	{
 		getGPS->readGpsDev();
@@ -76,7 +76,7 @@ int CConGPS::Process()
 		{
 			cnt=10;
 		}
-		sleep(2);
+		sleep(1);
 	}
 	return 1;
 }
@@ -160,7 +160,7 @@ int CConGPS::Init()
 	}
 	for(int i=0;i<g_latitude.size()-1;i++)
 	{
-		//cout<<g_latitude[i]<<" "<<g_longitude[i]<<" "<<g_location[i]<<endl;
+		cout<<g_latitude[i]<<" "<<g_longitude[i]<<" "<<g_location[i]<<endl;
 	}
 	if(getGPS->initGpsDev()==-1)
 	{
@@ -190,7 +190,7 @@ int CConGPS::CompareLocation(char** location)
 		
 			for(int i=0;i<g_latitude.size()-1;i++)
 			{	
-				if(abs(latitude-g_latitude[i])<RADIU && abs(longitude-g_longitude[i])<RADIU)
+				if(latitude==g_latitude[i]&& longitude==g_longitude[i])
 				{
 					cout<<"location get!"<<endl;
 					if(location!=NULL)
@@ -199,11 +199,10 @@ int CConGPS::CompareLocation(char** location)
 					}
 					return 1;
 				}
-				else
-					cout<<"location not get!"<<endl;
 			}
 		}
 		//sleep(1);
+                //cout<<"location not get!"<<endl;
 		return 0;
 	}
 }

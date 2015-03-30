@@ -27,7 +27,7 @@
 
 using namespace std;
 
-int main()
+int main(int argc,char* argv[])
 {
 		int running=1;
 		void *shm = NULL;
@@ -35,7 +35,7 @@ int main()
 		//char buffer[BUFSIZ + 1];
 		int shmid;
 		/* create share memory */
-		shmid=shmget((key_t)1234,sizeof(shared_use_st),0666|IPC_CREAT);
+		shmid=shmget((key_t)atoi(argv[1]),sizeof(shared_use_st),0666|IPC_CREAT);
 		if(shmid==-1)
 		{
 				fprintf(stderr,"shmget failed\n");
@@ -57,28 +57,31 @@ int main()
 		bool arrived=false;
 		while(running)
 		{
+                                //int ret=conGPS->CompareLocation(current_location);
 				if(conGPS->CompareLocation(current_location)&&!arrived)
 				{
-						if(conGPS->ComfirmArrive())
+						//if(conGPS->ComfirmArrive())
 						{
 							arrived = true;
 							shared->written=-1;
 							//*current_location: arrive location
-							cout<<*current_location<<endl;
+							cout<<"arrive:"<<*current_location<<endl;
 							strncpy(shared->text,*current_location,TEXT_SZ);
 							shared->written=1;
 						}
 				}
 				else if(!conGPS->CompareLocation(current_location)&&arrived)
 				{
-						if(!conGPS->ComfirmArrive())
+						//if(!conGPS->ComfirmArrive())
 						{
 							arrived=false;
+                                                        cout<<"leave:"<<*current_location<<endl;
 							shared->written=0;
 						}
 				}
-				else
-					sleep(1);
+                                cout<<conGPS->GetLatitude()<<" "<<conGPS->GetLongitude()<<endl;
+				
+			        sleep(1);
 		}
 		if(shmdt(shm)==-1)
 		{

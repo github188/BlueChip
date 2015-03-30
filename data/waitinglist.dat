@@ -1,1 +1,1 @@
-
+insert into t_record(BusId,Date,StartTime,ArriveTime,Duration,Departure,Destination,Passenger) values('MO12345','2015-03-30','16:39:27','16:39:37','00:00:00','','',0)

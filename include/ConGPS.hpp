@@ -48,6 +48,8 @@ class CConGPS
 		 * @return location:*/
 		int CompareLocation(char** location=NULL);
 		int ComfirmArrive();
+                double GetLatitude(){ return latitude;};
+                double GetLongitude(){ return longitude;};
 	protected:
 		int Init();
 	private:

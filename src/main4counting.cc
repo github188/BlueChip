@@ -69,23 +69,27 @@ int main(int argc,char* argv[])
 		bool arrive=false;
 		while(running)
 		{
-                                IplImage* input_image=usbStream->GetImage(fd);
-				if(shared->written)
+                IplImage* input_image=usbStream->GetImage(fd);
+				if(/*shared->written*/1)
 				{
 						if(!arrive)
 						{
-							cout<<"Arrive Signal..."<<endl;
+							//cout<<"Arrive Signal..."<<endl;
 							//arrived
-							arrive=true;
+							//arrive=true;
 							conSendData->SendArriveSignal(shared->text);
-                                                        conSendData->GetData(countWithDirect->GetUpNum(),countWithDirect->GetDownNum());
-                                                        countWithDirect->Zero();
+                            conSendData->GetData(countWithDirect->GetUpNum(),countWithDirect->GetDownNum());
+                            countWithDirect->Zero();
 						}
 						int ret=countWithDirect->Process(input_image);  
-                                                /* For test */    
-                                                cvNamedWindow("Input_Image",1);
-		                                cvShowImage("Input_Image",input_image);
-                                                int key=cvWaitKey(1);
+						if(ret>0)
+						{
+								cout<<countWithDirect->GetUpNum()<<endl;
+						}
+                                        /* For test */    
+                                        cvNamedWindow("Input_Image",1);
+	                                    cvShowImage("Input_Image",input_image);
+                                        int key=cvWaitKey(1);
 		                                if(key==27)
 		                                {
                                                         cout<<"leave signal..."<<endl;
@@ -99,6 +103,11 @@ int main(int argc,char* argv[])
                                                         conSendData->GetData(countWithDirect->GetUpNum(),countWithDirect->GetDownNum());
                                                         countWithDirect->Zero();
 		                                }
+												if(key=='o')
+												{
+														cout<<countWithDirect->GetUpNum()<<" "<<countWithDirect->GetDownNum()<<endl;
+														running=0;
+												}
 						/* For test end  */
 
 				}
