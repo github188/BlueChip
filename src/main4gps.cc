@@ -55,6 +55,7 @@ int main(int argc,char* argv[])
 		char** current_location;
 		*current_location=new char[20];
 		bool arrived=false;
+                char ch;
 		while(running)
 		{
                                 //int ret=conGPS->CompareLocation(current_location);

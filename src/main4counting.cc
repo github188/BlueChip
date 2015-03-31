@@ -74,11 +74,11 @@ int main(int argc,char* argv[])
 				{
 						if(!arrive)
 						{
-							//cout<<"Arrive Signal..."<<endl;
-							//arrived
-							//arrive=true;
-							conSendData->SendArriveSignal(shared->text);
-                            conSendData->GetData(countWithDirect->GetUpNum(),countWithDirect->GetDownNum());
+							cout<<"Arrive Signal..."<<endl;
+							arrived
+							arrive=true;
+							//conSendData->SendArriveSignal(shared->text);
+                            //conSendData->GetData(countWithDirect->GetUpNum(),countWithDirect->GetDownNum());
                             countWithDirect->Zero();
 						}
 						int ret=countWithDirect->Process(input_image);  
