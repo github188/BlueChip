@@ -75,7 +75,6 @@ int main(int argc,char* argv[])
 						if(!arrive)
 						{
 							cout<<"Arrive Signal..."<<endl;
-							arrived
 							arrive=true;
 							//conSendData->SendArriveSignal(shared->text);
                             //conSendData->GetData(countWithDirect->GetUpNum(),countWithDirect->GetDownNum());

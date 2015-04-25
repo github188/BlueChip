@@ -54,7 +54,7 @@ int main()
 		if(conGPS->CompareLocation(current_location)&&g_arrive) //arrived
 		{
 			cout<<"arrive:"<<*current_location<<endl;
-			conSendData->SendArriveSignal(*current_lacation);
+            conSendData->SendArriveSignal(*current_location);
 			/********** begin counting *************/
 			bool stop=false;
 			while(!stop)
@@ -65,7 +65,7 @@ int main()
 					if(!conGPS->ComfirmArrive()) //left
 					{
 						/*****Send Data***********/
-						conSendData->GetData(countWithDirect->GetUpNum(),countWithDirect->GetDownNum())
+                        conSendData->GetData(countWithDirect->GetUpNum(),countWithDirect->GetDownNum());
 						stop=true;
 						g_arrive=false;
 						countWithDirect->Zero();

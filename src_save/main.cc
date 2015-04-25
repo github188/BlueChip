@@ -25,6 +25,8 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include <time.h>
+
 #define VIDEO_DEVICE "/dev/video0"
 
 using namespace std;
@@ -43,13 +45,18 @@ int main()
 	CvVideoWriter* video = cvCreateVideoWriter("test.avi",
 			CV_FOURCC('X','V','I','D'),20,
 			cvSize(720,480),1);
+	double last_time=0.00f;
+	clock_t start,finish;
 	while(1)
 	{
+		start=clock();
         	int key=cvWaitKey(1);
         	IplImage* img=usbStream->GetImage(fd);
         	cvShowImage("img",img);
 		cvWriteFrame(video,img);
-        	if(key==27)
+		finish=clock();
+		last_time+=(double)(finish-start)/CLOCKS_PER_SEC;
+        	if(last_time>108000.00f)
         	{
             		break;
         	}
