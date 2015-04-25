@@ -52,7 +52,7 @@ int main()
 		start=clock();
         	int key=cvWaitKey(1);
         	IplImage* img=usbStream->GetImage(fd);
-        	cvShowImage("img",img);
+        //	cvShowImage("img",img);
 		cvWriteFrame(video,img);
 		finish=clock();
 		last_time+=(double)(finish-start)/CLOCKS_PER_SEC;
