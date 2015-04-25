@@ -56,6 +56,7 @@ int main()
 		cvWriteFrame(video,img);
 		finish=clock();
 		last_time+=(double)(finish-start)/CLOCKS_PER_SEC;
+		cvReleaseImage(&img);
         	if(last_time>108000.00f)
         	{
             		break;
