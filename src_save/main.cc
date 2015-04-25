@@ -46,22 +46,25 @@ int main()
 			CV_FOURCC('X','V','I','D'),20,
 			cvSize(720,480),1);
 	double last_time=0.00f;
+	int count=0;
 	clock_t start,finish;
 	while(1)
 	{
+		++count;
 		start=clock();
         	int key=cvWaitKey(1);
         	IplImage* img=usbStream->GetImage(fd);
         //	cvShowImage("img",img);
 		cvWriteFrame(video,img);
 		finish=clock();
-		last_time+=(double)(finish-start)/CLOCKS_PER_SEC;
+		//last_time+=(double)(finish-start)*1000/CLOCKS_PER_SEC;
 		cvReleaseImage(&img);
-        	if(last_time>3600.00f)
+        	if(key==27||count>1200) /* 1 minute */
         	{
             		break;
         	}
 	}
+	cout<<"!--end--!"<<endl;
 	usbStream->stop_capturing(fd);
 	usbStream->uninit_camer_device(fd);
 	usbStream->close_camer_device(fd);
