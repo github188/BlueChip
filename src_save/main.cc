@@ -43,10 +43,9 @@ int main()
 	usbStream->start_capturing(fd);
 	/* init video writer */
 	CvVideoWriter* video = cvCreateVideoWriter("test.avi",
-			CV_FOURCC('X','V','I','D'),20,
+			CV_FOURCC('D','I','V','X'),20,
 			cvSize(720,480),1);
 	double last_time=0.00f;
-	int count=0;
 	clock_t start,finish;
 	while(1)
 	{
@@ -59,7 +58,7 @@ int main()
 		finish=clock();
 		//last_time+=(double)(finish-start)*1000/CLOCKS_PER_SEC;
 		cvReleaseImage(&img);
-        	if(key==27||count>1200) /* 1 minute */
+            if(key==27) /* 1 minute */
         	{
             		break;
         	}

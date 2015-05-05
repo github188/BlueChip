@@ -15,13 +15,17 @@ DIR_3RD_MYSQL=${DIR_3RD}/mysql
 DIR_LIB_MYSQL=${DIR_LIB}/lib_mysql6.1.5_i686
 #extremevision
 DIR_LIB_EXTREMEVISION = ${DIR_LIB}/lib_extremevision
+#ffmpeg
+DIR_LIB_FFMPEG = ${DIR_LIB}/lib_ffmpeg
+#x264
+DIR_LIB_X264 = ${DIR_LIB}/lib_x264
 
 $(shell mkdir -p ${DIR_OBJ})
 $(shell mkdir -p ${DIR_BIN})
 
 CC=g++
 CXXFLAGS=-g -Wall -I${DIR_INC} -I${DIR_3RD} -I${DIR_3RD_OPENCV} -I${DIR_3RD_OPENCV2} -I${DIR_3RD_MYSQL}
-LDFLAGS = -L${DIR_LIB} -L${DIR_LIB_EXTREMEVISION} -Wl,-rpath=../lib -Wl,-rpath=../lib/lib_extremevision -L${DIR_LIB_OPENCV} -Wl,-rpath=../lib/lib_opencv-2.4.9_x86 -L${DIR_LIB_MYSQL} -Wl,-rpath=../lib/lib_mysql6.1.5_i686
+LDFLAGS = -L${DIR_LIB} -L${DIR_LIB_EXTREMEVISION} -L${DIR_LIB_X264} -L${DIR_LIB_FFMPEG} -Wl,-rpath=../lib -Wl,-rpath=../lib/lib_extremevision -L${DIR_LIB_OPENCV} -Wl,-rpath=../lib/lib_opencv-2.4.9_x86 -L${DIR_LIB_MYSQL} -Wl,-rpath=../lib/lib_mysql6.1.5_i686 -Wl,-rpath=../lib/lib_x264 -Wl,-rpath=../lib/lib_ffmpeg
 SRC=$(wildcard ${DIR_SRC}/*.cc)
 OBJ=$(patsubst %.cc,${DIR_OBJ}/%.o,$(notdir $(SRC)))
 
@@ -29,12 +33,14 @@ TARGET = Bus_Counting_Save
 
 BIN_TARGET = ${DIR_BIN}/${TARGET}
 
-LIBS_OPENCV = -lopencv_core -lopencv_highgui -lopencv_calib3d -lopencv_contrib -lopencv_features2d -lopencv_flann -lopencv_gpu -lopencv_imgproc -lopencv_legacy -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_videostab
+LIBS_OPENCV = -lopencv_core -lopencv_highgui -lopencv_calib3d -lopencv_contrib -lopencv_features2d -lopencv_flann -lopencv_gpu -lopencv_imgproc -lopencv_legacy -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_video
 LIBS_EXTREMEVISION = -levtool -levdatabase -levcounting -levstream
 LIBS_MYSQL = -lmysqlclient
+LIBS_FFMPEG = -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lpostproc -lswresample -lswscale
+LIBS_X264 = -lx264
 
 ${BIN_TARGET} : ${OBJ}
-	$(CC) $(OBJ) -o $@ $(LDFLAGS) ${LIBS_EXTREMEVISION} ${LIBS_OPENCV} ${LIBS_MYSQL} -lpthread
+	$(CC) $(OBJ) -o $@ $(LDFLAGS) ${LIBS_EXTREMEVISION} ${LIBS_OPENCV} ${LIBS_MYSQL} ${LIBS_X264} ${LIBS_FFMPEG} -lpthread
 ${DIR_OBJ}/%.o: ${DIR_SRC}/%.cc
 	$(CC) $(CXXFLAGS) -c $< -o $@
 .PHONY:clean
