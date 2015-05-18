@@ -33,10 +33,13 @@
 #include <errno.h>
 #include <assert.h>
 
+#include <time.h>
+
 #include "cv.h"
 #include "highgui.h"
-
 using namespace cv;
+
+#include "VideoProc.hpp"
 
 typedef struct _v4l2_struct
 {
@@ -50,13 +53,11 @@ typedef struct
 	int length;
 }BUFTYPE;
 
-class EVUsbStream
+class CUsbStream
 {
 	public:
-		EVUsbStream();
-		~EVUsbStream();
-		BUFTYPE* user_buf;
-		int n_buffer;
+        	CUsbStream();
+       		~CUsbStream();
 		int open_camer_device();
 		void close_camer_device(int fd);
 		int init_camer_device(int fd);
@@ -66,11 +67,10 @@ class EVUsbStream
 		int mainloop(int fd);
 		void stop_capturing(int fd);
 		void uninit_camer_device(int fd);
-		/***2015.2.12 added by lauren***/
-		IplImage* GetImage(int fd);
+		/***2015.2.12 added by Lauren***/
 		void set_device(char* device_name);
-		void setSize(int frame_height,int frame_width);
-
+		/* 2015.5.17 added by Lauren */
+		void Process();
 	protected:
 		int init_mmap(int fd);
 		uchar* p;
@@ -80,8 +80,13 @@ class EVUsbStream
 	private:
 		int m_height;
 		int m_width;
-
-
+        	BUFTYPE* user_buf;
+        	int n_buffer;
+		/* 2015.5.17 added by Lauren */
+		CVideoProc* videoProc;
+	        CvFont font;
+        	char datentime[64];
+		//CvVideoWriter* video; //save as video
 };
 
 #endif

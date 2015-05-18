@@ -14,7 +14,7 @@
 
 using namespace std;
 
-class CConSendData
+class CConSendData : public EVMySql
 {
 	public:
 		CConSendData();
@@ -23,7 +23,7 @@ class CConSendData
 		int SendLeaveSignal(char* dep);
 		int GetData(int in,int out);
 	protected:
-		int Init();
+        int InitConSendData();
 		int SendData();
 		string delta_time(const char* src_starttime,const char* src_arrivetime);		
 		int SaveToWaitingList(char* sql);
@@ -37,7 +37,6 @@ class CConSendData
 						string current_destination,
 						string c_num);
 	private:
-		EVMySql* evMySql;
 		char* db_addr;
 		char* db_user;
 		char* db_pswd;

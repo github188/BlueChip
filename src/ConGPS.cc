@@ -38,7 +38,6 @@ using namespace std;
 
 CConGPS::CConGPS()
 {
-	getGPS=new EVGetGPS;
 	latitude=0.000000;
 	longitude=0.000000;
 	m_init=false;
@@ -46,12 +45,11 @@ CConGPS::CConGPS()
 
 CConGPS::~CConGPS()
 {
-	delete getGPS;
 }
 
 int CConGPS::Process()
 {
-	if(getGPS->initGpsDev()==-1)
+    if(initGpsDev()==-1)
 	{
 	//	cout<<"init failed !"<<endl;
 		return 0;
@@ -60,14 +58,14 @@ int CConGPS::Process()
 	int cnt=1;
 	while(!done)
 	{
-		getGPS->readGpsDev();
-		if(getGPS->get_status())
+        readGpsDev();
+        if(get_status())
 		{
 			cnt--;
 			if(cnt==0)
 			{
-				latitude=getGPS->get_latitude();
-				longitude=getGPS->get_longitude();
+                latitude=get_latitude();
+                longitude=get_longitude();
 				//cout<<latitude<<" "<<longitude<<endl;
 				done=true;
 			}
@@ -162,7 +160,7 @@ int CConGPS::Init()
 	{
 		cout<<g_latitude[i]<<" "<<g_longitude[i]<<" "<<g_location[i]<<endl;
 	}
-	if(getGPS->initGpsDev()==-1)
+    if(initGpsDev()==-1)
 	{
 		//cout<<"init failed !"<<endl;
 		return 0;
@@ -182,11 +180,11 @@ int CConGPS::CompareLocation(char** location)
 	}
 	else
 	{
-		getGPS->readGpsDev();
-		if(getGPS->get_status())
+        readGpsDev();
+        if(get_status())
 		{
-			latitude=getGPS->get_latitude();
-			longitude=getGPS->get_longitude();
+            latitude=get_latitude();
+            longitude=get_longitude();
 		
 			for(int i=0;i<g_latitude.size()-1;i++)
 			{	
@@ -207,25 +205,6 @@ int CConGPS::CompareLocation(char** location)
 	}
 }
 
-int CConGPS::ComfirmArrive()
-{
-	int arr=0;
-	for(int i=0;i<10;i++)
-	{
-		if(CompareLocation())
-		{
-			arr++;
-		}
-	}
-	if(arr>5)
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
 
 
 

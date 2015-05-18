@@ -12,9 +12,8 @@ CConSendData::CConSendData()
 	db_user=new char[20];
 	db_pswd=new char[20];
 	db_name=new char[20];
-	evMySql=new EVMySql();
 	db_init=false;
-	Init();
+    InitConSendData();
 	last_num=0;
         current_dep_time="00:00:00";
         current_des_time="00:00:00";
@@ -27,7 +26,6 @@ CConSendData::~CConSendData()
 	delete db_user;
 	delete db_pswd;
 	delete db_name;
-	delete evMySql;
 }
 
 int CConSendData::SendArriveSignal(char* des)
@@ -68,7 +66,7 @@ int CConSendData::GetData(int in,int out)
 	return 0;
 }
 
-int CConSendData::Init()
+int CConSendData::InitConSendData()
 {
 	/* get database information */
 	ifstream inFile(DATABASE_FILE);
@@ -91,7 +89,7 @@ int CConSendData::Init()
 	puts(tmp_date);
 	current_date=tmp_date;
 	/* init database connection */
-	if(!evMySql->Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port))
+    if(!Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port))
 	{
 		printf("Success to connet to database!\n");
 		return 0;
@@ -107,7 +105,7 @@ int CConSendData::SendData()
 		vector<char*>::iterator it=waiting_list.begin();
 		while(it!=waiting_list.end())
 		{
-			if(evMySql->Insert(*it))
+            if(Insert(*it))
 			{
 				it=waiting_list.erase(it);
 			}
@@ -143,7 +141,7 @@ int CConSendData::SendData()
 	//cout<<sql.data()<<endl;
 	if(db_init&&current_duration!="00:00:00")
 	{
-		if(!evMySql->Insert(sql.data()))
+        if(!Insert(sql.data()))
 		{
 			SaveToWaitingList((char*)sql.data());
 			return 0;
@@ -153,7 +151,7 @@ int CConSendData::SendData()
 	else
 	{
 		SaveToWaitingList((char*)sql.data());
-		if(!evMySql->Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port))
+        if(!Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port))
 		{
 			perror("Fail to connet to database!\n");
 			return 0;

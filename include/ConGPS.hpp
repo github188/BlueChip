@@ -24,10 +24,11 @@
 #include <vector>
 #include <iostream>
 using namespace std; 
-class CConGPS
+
+class CConGPS : public EVGetGPS
 {
 	public:
-		CConGPS();
+        CConGPS();
 		~CConGPS();
 		/*******Setting GPS Data*******************************************************/
 		/* Getting GPS data
@@ -47,13 +48,9 @@ class CConGPS
 		 * @return 0: compare not match
 		 * @return location:*/
 		int CompareLocation(char** location=NULL);
-		int ComfirmArrive();
-                double GetLatitude(){ return latitude;};
-                double GetLongitude(){ return longitude;};
 	protected:
 		int Init();
 	private:
-		EVGetGPS* getGPS;
 		double latitude;
 		double longitude; 
 		vector<double> g_latitude;
