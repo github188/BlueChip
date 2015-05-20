@@ -376,7 +376,7 @@ int CUsbStream::process_image(void *addr,int length)
     {
         close(h264_fd);
         //new file
-        strftime(filename,sizeof(filename),"/root/videos/%Y%m%d%H2.h264",localtime(&t));
+        strftime(filename,sizeof(filename),"/root/videos/%Y%m%d%H.h264",localtime(&t));
         if((h264_fd=open(filename,O_CREAT | O_RDWR | O_APPEND,777))==-1)
         {
             printf("crete a picture file error!\n");
