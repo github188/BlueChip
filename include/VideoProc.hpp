@@ -34,6 +34,7 @@ using namespace std;
 
 #include "ConGPS.hpp"
 #include "ConSendData.hpp"
+#include "Log.hpp"
 
 enum Status
 {
@@ -115,6 +116,9 @@ class CVideoProc
 
 		//send data to remote database
 		CConSendData* conSendData;
+
+        //Log
+        CLog* log;
 };
 
 #endif

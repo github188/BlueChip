@@ -57,11 +57,15 @@ CVideoProc::CVideoProc()
 	conGPS = new CConGPS();
 	/* init SendData */
 	conSendData = new CConSendData();
+    /* init log */
+    log = new CLog();
 }
 
 CVideoProc::~CVideoProc()
 {
-
+    delete conGPS;
+    delete conSendData;
+    delete log;
 }
 
 void CVideoProc::CheckStatus()
@@ -105,9 +109,9 @@ int CVideoProc::Init(IplImage* m_image)
     	absdiff=cvCreateImage(cvSize(image->width,image->height),IPL_DEPTH_8U,1);
     	absthresh=cvCreateImage(cvSize(image->width,image->height),IPL_DEPTH_8U,1);
     	/* init variables */
-    	m_width=image->width;
+	m_x = 100;
+    	m_width=image->width-2*m_x;
     	m_height=100;
-    	m_x=0;
     	m_y=(int)(0.5*image->height-0.5*m_height);
     	rect=cvRect(m_x,m_y,m_width,m_height);
     	rect1=cvRect(m_x,m_y,m_width,10);
@@ -180,7 +184,7 @@ int CVideoProc::Process(const Mat frame)
             DrawRect(image,destination[1],CV_RGB(0,255,0));
         }
 	//cvLine(absthresh,cvPoint(15,15),cvPoint(250,250),CV_RGB(255,255,255),3,8,0); //test line
-        cvShowImage("image",absthresh);
+        //cvShowImage("image",absthresh);
 
     	/************************ direction ***************************/
 
@@ -194,10 +198,10 @@ int CVideoProc::Process(const Mat frame)
 	//cvCvtColor(image,gray,CV_BGR2GRAY); //for rgb use
 	//cvCopy(image,gray); //for gray use
 	cvThreshold(image,gray,m_menxian,255,CV_THRESH_BINARY_INV);
-	cvShowImage("gray",gray);
+//	cvShowImage("gray",gray);
 
 	cvResetImageROI(gray);
-	cvShowImage("gray_rest",gray);
+//	cvShowImage("gray_rest",gray);
   
     	last_objpix=objpix;
     	if(up==TRUE){
@@ -253,12 +257,14 @@ int CVideoProc::Process(const Mat frame)
         	if(objforori2+objforori1<0)
         	{
             		m_iIn++;
-			cout<<"in:"<<m_iIn<<endl;
+                    cout<<"in:"<<m_iIn<<endl;
+                    log->Mark(m_iIn);
         	}
         	else
         	{
             		m_iIn--;
-			cout<<"out:"<<m_iIn<<endl;
+                    cout<<"out:"<<m_iIn<<endl;
+                    log->Mark(m_iIn);
         	}
     	}
 

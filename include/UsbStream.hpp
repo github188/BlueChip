@@ -39,6 +39,7 @@
 #include "highgui.h"
 using namespace cv;
 
+#include "Encoder.hpp"
 #include "VideoProc.hpp"
 
 typedef struct _v4l2_struct
@@ -87,6 +88,10 @@ class CUsbStream
 	        CvFont font;
         	char datentime[64];
 		//CvVideoWriter* video; //save as video
+		CEncoder* encoder;
+		char filename[64];
+		int h264_fd;
+        int nFrame;
 };
 
 #endif

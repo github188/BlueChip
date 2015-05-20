@@ -23,6 +23,8 @@
 #define WIDTH 720
 #define HEIGHT 480
 
+Encoder en;
+
 int convert_yuv_to_rgb_pixel(int y, int u, int v)
 {
      unsigned int pixel32 = 0;
@@ -117,7 +119,14 @@ CUsbStream::CUsbStream()
 
 	/* init video writer */
 	//video = cvCreateVideoWriter("test.avi",CV_FOURCC('D','I','V','X'),20,cvSize(720,480),1);
-
+	
+	/* init encoder */
+    nFrame=0;
+	encoder = new CEncoder();
+	FILE* pp = popen("mkdir /root/videos","r");
+	pclose(pp);
+	time_t t = time(0);
+	strftime(filename,sizeof(filename),"/root/videos/%Y%m%d%H.h264",localtime(&t));
 }
 
 CUsbStream::~CUsbStream()
@@ -125,6 +134,7 @@ CUsbStream::~CUsbStream()
 	delete device;
 	delete p;
 	delete videoProc;
+	delete encoder;
 }
 
 void CUsbStream::Process()
@@ -145,6 +155,13 @@ void CUsbStream::set_device(char* device_name)
 
 int CUsbStream::open_camer_device()
 {
+	/************* save to h264 file **********************************/
+	if((h264_fd = open(filename,O_CREAT | O_RDWR | O_APPEND,777)) == -1)
+	{
+		printf("create file error!\n");
+	}	
+	/*******************************************************************/
+
 	int fd;
 
 	if((fd = open(device,O_RDWR | O_NONBLOCK)) < 0)
@@ -235,6 +252,8 @@ int CUsbStream::init_camer_device(int fd)
 	fmt.index = 0;
 	fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
+    encoder->compress_begin(&en,WIDTH,HEIGHT);
+
 	while((ret = ioctl(fd,VIDIOC_ENUM_FMT,&fmt)) == 0)
 	{
 		fmt.index ++ ;
@@ -272,7 +291,7 @@ int CUsbStream::init_camer_device(int fd)
 	stream_fmt.fmt.pix.width = m_width;
 	stream_fmt.fmt.pix.height = m_height;
     	stream_fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV; //YUV422
-    	stream_fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
+        stream_fmt.fmt.pix.field = V4L2_FIELD_ALTERNATE;
 
 	if(-1 == ioctl(fd,VIDIOC_S_FMT,&stream_fmt))
 	{
@@ -321,35 +340,73 @@ int CUsbStream::start_capturing(int fd)
 //将采集好的数据放到文件中
 int CUsbStream::process_image(void *addr,int length)
 {
-	/* For gray frame */
-    	m_Image = cvCreateImageHeader(cvSize(WIDTH,HEIGHT),IPL_DEPTH_8U,1);
-    	delete p;
-    	p=new uchar[m_height*m_width];
-    	spliteY((uchar*)addr,p,m_width,m_height);
-	cvSetData(m_Image,p,m_width);
-	/********** For rgb frame *********
-	m_Image = cvCreateImageHeader(cvSize(WIDTH,HEIGHT),IPL_DEPTH_8U,3);
-	delete p;
-	p=new uchar[m_height*m_width*3+1];
-	yuvtorgb0((unsigned char*)addr,p,m_width,m_height);
-	cvSetData(m_Image,p,m_width*3);
-	************************************/
+    /* For gray frame */
+        m_Image = cvCreateImageHeader(cvSize(WIDTH,HEIGHT),IPL_DEPTH_8U,1);
+        delete p;
+        p=new uchar[m_height*m_width];
+        spliteY((uchar*)addr,p,m_width,m_height);
+    cvSetData(m_Image,p,m_width);
+    /********** For rgb frame *********
+    m_Image = cvCreateImageHeader(cvSize(WIDTH,HEIGHT),IPL_DEPTH_8U,3);
+    delete p;
+    p=new uchar[m_height*m_width*3+1];
+    yuvtorgb0((unsigned char*)addr,p,m_width,m_height);
+    cvSetData(m_Image,p,m_width*3);
+    ************************************/
 
-	/* video process */
-	videoProc->Process(m_Image);
+    /* video process */
+    //videoProc->Process(m_Image);
 	
-	/* write date and time */
-	/* init date */
-    	time_t t=time(0);
-    	strftime(datentime,sizeof(datentime),"%Y-%m-%d %H:%M:%S",localtime(&t));
-    	cvPutText(m_Image,datentime,cvPoint(15,50),&font,CV_RGB(255,0,0));
+    /* write date and time */
+    /* init date */
+        time_t t=time(0);
+        strftime(datentime,sizeof(datentime),"%Y-%m-%d %H:%M:%S",localtime(&t));
+        cvPutText(m_Image,datentime,cvPoint(15,50),&font,CV_RGB(255,0,0));
 
-	cvShowImage("Video Frame",m_Image);
+    /* show image */
+    cvShowImage("Video Frame",m_Image);
+
+
 	
-	/* save video */
-	//cvWriteFrame(video,m_Image);
+    /* splite videos into several parts */
+    char ctime[10];
+    strftime(ctime,sizeof(ctime),"%M%S",localtime(&t));
+    int n = atoi(ctime);
+    if(n>0&&n<30)
+    {
+        close(h264_fd);
+        //new file
+        strftime(filename,sizeof(filename),"/root/videos/%Y%m%d%H2.h264",localtime(&t));
+        if((h264_fd=open(filename,O_CREAT | O_RDWR | O_APPEND,777))==-1)
+        {
+            printf("crete a picture file error!\n");
+        }
+    }
 
-    	cvWaitKey(1);
+    nFrame++;
+    if(nFrame == 2)
+    {
+        /* write to file */
+        int write_size;
+        int h264_length = 0;
+        uint8_t *h264_buf = NULL;
+        h264_buf = (uint8_t*)malloc(sizeof(uint8_t)*(WIDTH)*(HEIGHT)*3);
+        h264_length = encoder->compress_frame(&en,-1,(uint8_t*)addr,h264_buf);
+        if(h264_length>0)
+        {
+            write_size = write(h264_fd,h264_buf,h264_length);
+            printf("write_size= %d\n",write_size);
+            if(write_size==-1)
+            {
+                printf("%s\n",filename);
+            }
+        }
+        free(h264_buf);
+        nFrame=0;
+    }
+
+    cvWaitKey(1);
+
 	return 0;
 }
 
@@ -421,6 +478,7 @@ int CUsbStream::mainloop(int fd)
 
 void CUsbStream::stop_capturing(int fd)
 {
+    close(h264_fd);
 	enum v4l2_buf_type type;
 	type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	if(-1 == ioctl(fd,VIDIOC_STREAMOFF,&type))
