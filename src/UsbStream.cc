@@ -384,7 +384,7 @@ int CUsbStream::process_image(void *addr,int length)
     }
 
     nFrame++;
-    if(nFrame == 2)
+    if(nFrame == 5)
     {
         /* write to file */
         int write_size;

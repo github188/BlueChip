@@ -30,7 +30,7 @@ typedef unsigned char BYTE;
 
 CVideoProc::CVideoProc()
 {
-	InitClassifier();
+    //InitClassifier();
 	/* init params */
 	m_iIn=0;
     	m_bInit=false;
@@ -55,10 +55,11 @@ CVideoProc::CVideoProc()
         start="00:00:00";
 	/* init GPS */
 	conGPS = new CConGPS();
+	*current_location = new char[20];
 	/* init SendData */
 	conSendData = new CConSendData();
-    /* init log */
-    log = new CLog();
+	/* init log */
+    	log = new CLog();
 }
 
 CVideoProc::~CVideoProc()
@@ -256,15 +257,19 @@ int CVideoProc::Process(const Mat frame)
         	cvResetImageROI(gray);
         	if(objforori2+objforori1<0)
         	{
+			//Get loaction
+			conGPS->CompareLocation(current_location);
+			cout<<*current_location<<endl;
+			
             		m_iIn++;
-                    cout<<"in:"<<m_iIn<<endl;
-                    log->Mark(m_iIn);
+                    	cout<<"in:"<<m_iIn<<endl;
+                    	log->Mark(m_iIn);
         	}
         	else
         	{
             		m_iIn--;
-                    cout<<"out:"<<m_iIn<<endl;
-                    log->Mark(m_iIn);
+                    	cout<<"out:"<<m_iIn<<endl;
+                    	log->Mark(m_iIn);
         	}
     	}
 

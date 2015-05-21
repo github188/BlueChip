@@ -117,8 +117,9 @@ class CVideoProc
 		//send data to remote database
 		CConSendData* conSendData;
 
-        //Log
-        CLog* log;
+	        //Log
+        	CLog* log;
+		char** current_location;
 };
 
 #endif

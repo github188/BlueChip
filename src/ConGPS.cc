@@ -33,7 +33,7 @@
 #include "tool/evgetgps.hpp"
 using namespace std; 
 
-#define DATAFILE "/root/Project_Master_Macau_System/data/locations.dat"
+#define DATAFILE "/root/BlueChip/data/locations.dat"
 #define RADIU 0.001 //about 500 meters
 
 CConGPS::CConGPS()

@@ -1,9 +1,9 @@
 #include "ConSendData.hpp"
 
-#define DATABASE_FILE "../data/database.dat"
-#define BUSID_FILE "../data/busid.dat"
-#define WAITING_FILE "../data/waitinglist.dat"
-#define DATA_FILE "../data/data.dat"
+#define DATABASE_FILE "/root/BlueChip/data/database.dat"
+#define BUSID_FILE "/root/BlueChip/data/busid.dat"
+#define WAITING_FILE "/root/BlueChip/data/waitinglist.dat"
+#define DATA_FILE "/root/BlueChip/data/data.dat"
 #define MAX_PASSAGER 37
 
 CConSendData::CConSendData()
