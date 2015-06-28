@@ -22,6 +22,7 @@ using namespace std;
 #include "con_gps.h"
 #include "con_send_data.h"
 #include "count_log.h"
+//#include "gmm4busybackground.h"
 
 enum Status
 {
@@ -101,6 +102,9 @@ class CVideoProc
         	int objforori2;
 		//direction
 		bool in;
+
+		//GMM4BusyBackground
+		//dbs::GMM4BusyBackground* gmm4busybackground;
 
 		//GPS
 		CConGPS* conGPS;

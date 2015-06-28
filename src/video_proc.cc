@@ -36,7 +36,7 @@ CVideoProc::CVideoProc(){
     	m_highlow=2500;
     	objforori1=0;
     	objforori2=0;
-        m_menxian=75;
+        m_menxian=25;
         //direction
         in = false;
         //init status
@@ -55,6 +55,8 @@ CVideoProc::CVideoProc(){
         conSendData = new CConSendData();
         //init log
         log = new CLog();
+	//init gmm4busybackground
+	//gmm4busybackground = new dbs::GMM4BusyBackground();
 }
 
 CVideoProc::~CVideoProc(){
@@ -97,10 +99,12 @@ int CVideoProc::Init(IplImage* m_image){
     	absdiff=cvCreateImage(cvSize(image->width,image->height),IPL_DEPTH_8U,1);
     	absthresh=cvCreateImage(cvSize(image->width,image->height),IPL_DEPTH_8U,1);
     	/* init variables */
-        m_x = 100;
-    	m_width=image->width-2*m_x;
+        m_x = 220;
+    	//m_width=image->width-2*m_x;
+        m_width=250;
     	m_height=100;
-    	m_y=(int)(0.5*image->height-0.5*m_height);
+    	//m_y=(int)(0.5*image->height-0.5*m_height);
+        m_y=250;
     	rect=cvRect(m_x,m_y,m_width,m_height);
     	rect1=cvRect(m_x,m_y,m_width,10);
     	rect2=cvRect(m_x,m_y+m_height-10,m_width,10);

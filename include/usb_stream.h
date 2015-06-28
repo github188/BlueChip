@@ -26,6 +26,7 @@
 #include "highgui.h"
 using namespace cv;
 
+#include "gmm4busybackground.h"
 #include "encoder.h"
 #include "video_proc.h"
 
@@ -84,6 +85,8 @@ class CUsbStream
 		int m_width;
         	BUFTYPE* user_buf;
         	int n_buffer;
+                //Instance of gmm4busybackground.
+                dbs::GMM4BusyBackground* gmm4busybackground;
 		//Instance of video processing.
 		CVideoProc* videoProc;
 	        CvFont font;

@@ -87,6 +87,9 @@ int spliteY(unsigned char * yuv, unsigned char* y, unsigned int width, unsigned 
 }
 
 CUsbStream::CUsbStream(){
+	/* init gmm4busybackground */
+	gmm4busybackground = new dbs::GMM4BusyBackground();
+
         n_buffer=0;
         device=new char(20);
         device=DEFAULT_DEVICE;
@@ -336,8 +339,18 @@ int CUsbStream::process_image(void *addr,int length){
     	yuvtorgb0((unsigned char*)addr,p,m_width,m_height);
     	cvSetData(m_Image,p,m_width*3);
     	************************************/
+	
+	/* gmm4busybackground */
+	cv::Mat frame(m_Image,1);
+	gmm4busybackground->Process(frame);
+
+	cv::Mat frame2 = gmm4busybackground->GetBackground2();
+	cv::Mat frame2_gray(480,720,CV_8UC1)
+	cv::cvtColor(frame2,frame2_gray,CV_BGR2GRAY);
 
     	/* video process */
+ 	IplImage frame_tmp=(IplImage)(frame2_gray);
+	IplImage* ipl_frame = &frame_tmp;
     	videoProc->Process(m_Image);
 	
     	/* write date and time */
@@ -349,7 +362,7 @@ int CUsbStream::process_image(void *addr,int length){
     	/* show image */
     	cvShowImage("Video Frame",m_Image);
 
-
+	/* save as video */
         if(bSave){
             /* splite videos into several parts */
             char ctime[10];
