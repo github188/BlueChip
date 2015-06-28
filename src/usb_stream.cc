@@ -351,7 +351,7 @@ int CUsbStream::process_image(void *addr,int length){
     	/* video process */
  	IplImage frame_tmp=(IplImage)(frame2_gray);
 	IplImage* ipl_frame = &frame_tmp;
-    	videoProc->Process(m_Image);
+    	videoProc->Process(ipl_frame);
 	
     	/* write date and time */
     	/* init date */

@@ -253,8 +253,7 @@ int CVideoProc::Process(const Mat frame){
                 log->Mark(m_iIn,start,conGPS->get_latitude(),conGPS->get_longitude());
 
                 return 1;
-        	}
-            else if(objforori2+objforori1>0){
+        	}else if(objforori2+objforori1>0){
                 //Get location
                 conGPS->CompareLocation(&des);
                 cout<<des<<endl;

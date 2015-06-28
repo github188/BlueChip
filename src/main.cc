@@ -8,10 +8,10 @@
 int main(int argc,char* argv[])
 {
         CUsbStream* usbStream = new CUsbStream();
-        if(usbStream->set_save(2,"/root/videos/")==-1){
-		cout<<"create save dir fail!"<<endl;
-		return -1;
-	}
+        //if(usbStream->set_save(2,"/root/videos/")==-1){
+	//	cout<<"create save dir fail!"<<endl;
+	//	return -1;
+	//}
         usbStream->Process();
         delete usbStream;
 	return 1;
