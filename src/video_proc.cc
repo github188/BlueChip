@@ -17,9 +17,7 @@
 typedef unsigned char BYTE;
 
 CVideoProc::CVideoProc(){
-    	//InitClassifier();
         //init params
-        m_iIn=0;
     	m_bInit=false;
     	m_bImage=10;
     	framecnt=0;
@@ -39,55 +37,11 @@ CVideoProc::CVideoProc(){
         m_menxian=25;
         //direction
         in = false;
-        //init status
-        status = onRest;
-        start = new char(64);
-        end = new char(64);
-        start="00:00:00";
-        end="00:00:00";
-        //init GPS
-        conGPS = new CConGPS();
-        conGPS->Init();
-        current_location = new char[20];
-        dep = new char[20];
-        des = new char[20];
-        //init SendData
-        conSendData = new CConSendData();
-        //init log
-        log = new CLog();
-	//init gmm4busybackground
-	//gmm4busybackground = new dbs::GMM4BusyBackground();
+	conCount = new ConCount();
 }
 
 CVideoProc::~CVideoProc(){
-        delete conGPS;
-        delete conSendData;
-        delete log;
-        delete start;
-        delete end;
-}
-
-void CVideoProc::CheckStatus(){
-        if(m_iIn>1){ //except the driver
-           // if(strcmp(*dep,*des)!=0){ // arrive
-               // log->Mark(m_iIn,"arrive");
-                //send data:departuren,destination,start,end
-        //		conSendData->GetDeparture(*dep);
-        //		conSendData->GetDestination(*des);
-        //		conSendData->GetStartTime(start);
-        //		conSendData->GetEndTime(end);
-        //		conSendData->GetData(m_iIn,0);
-         //   }
-        }
-}
-
-void CVideoProc::InitClassifier(){
-        //--Load the cascades
-        String head_cascade_name = "/root/BlueChip/data/haarcascade_head_overview.xml";
-        if( !head_cascade.load( head_cascade_name) ){
-            printf("--(!)Error loading\n");
-            return;
-        }
+       
 }
 
 int CVideoProc::Init(IplImage* m_image){
@@ -109,12 +63,6 @@ int CVideoProc::Init(IplImage* m_image){
     	rect1=cvRect(m_x,m_y,m_width,10);
     	rect2=cvRect(m_x,m_y+m_height-10,m_width,10);
         return 1;
-}
-
-int CVideoProc::FindHead(Mat frameROI_grey){
-        vector<Rect> heads;
-    	head_cascade.detectMultiScale(frameROI_grey,heads,1.1,2,0|CV_HAAR_SCALE_IMAGE,Size(24,24));
-        return heads.size();
 }
 
 /* **********************************************************************************
@@ -235,41 +183,14 @@ int CVideoProc::Process(const Mat frame){
         	cvSetImageROI(gray,rect2);
         	objforori2=cvCountNonZero(gray)-objforori2;
         	cvResetImageROI(gray);
-        	time_t t1 = time(0);
             	if(objforori2+objforori1<0){
-                //Get loaction
-                conGPS->CompareLocation(&dep);
-                cout<<dep<<endl;
-
-                //update start time
-                char tmp_start[64];
-                strftime(tmp_start,sizeof(tmp_start),"%H:%M:%S",localtime(&t1));
-                start = tmp_start;
-
-                //CheckStatus();
-
-                m_iIn++;
-                in = true;
-                log->Mark(m_iIn,start,conGPS->get_latitude(),conGPS->get_longitude());
-
-                return 1;
+                	in = true;
+			conCount->CountProcess(in);
+                	return 1;
         	}else if(objforori2+objforori1>0){
-                //Get location
-                conGPS->CompareLocation(&des);
-                cout<<des<<endl;
-
-                //update end time
-                char tmp_end[64];
-                strftime(tmp_end,sizeof(tmp_end),"%H:%M:%S",localtime(&t1));
-                end = tmp_end;
-
-                //CheckStatus();
-
-                m_iIn--;
-                in = false;
-                log->Mark(m_iIn,end,conGPS->get_latitude(),conGPS->get_longitude());
-		
-                return 1;
+                	in = false;
+			conCount->CountProcess(in);
+                	return 1;
         	}
     	}
 

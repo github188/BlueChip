@@ -94,8 +94,56 @@ int CConSendData::InitConSendData(){
 	return 1;
 }
 
+int CConSendData::SendData(char* start,char* end,char* des,char* dep,int passager){
+        current_dep_time=start;
+        current_des_time=end;
+        current_departure=dep;
+        current_destination=des;
+        current_duration=delta_time(start,end);
+
+        char c_num[10];
+        sprintf(c_num,"%d",passager);
+        string sql;                                                         
+        sql="insert into t_record(BusId,Date,StartTime,ArriveTime,Duration,Departure,Destination,Passenger) values(";
+        sql+="'";
+        sql+=busid;
+        sql+="','";                                                         
+        sql+=current_date;
+        sql+="','";                                                         
+        sql+=current_dep_time;                                              
+        sql+="','";                                                         
+        sql+=current_des_time;                                              
+        sql+="','";                                                         
+        sql+=current_duration;
+        sql+="','";                                                         
+        sql+=current_departure;
+        sql+="','";                                                         
+        sql+=current_destination;                                           
+        sql+="',";                                                          
+        sql+=c_num;
+        sql+=")";
+        //SaveToLocal(busid,current_date,current_dep_time,current_des_time,current_duration,current_departure,current_destination,c_num);
+        //cout<<sql.data()<<endl;
+        if(current_duration!="00:00:00"){                          
+                if(!Insert(sql.data())){
+                        //SaveToWaitingList((char*)sql.data());             
+                        return 0;
+                }
+                return 1;
+        }else{
+        /*      SaveToWaitingList((char*)sql.data());
+                if(!Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port)){
+                        perror("Fail to connet to database!\n");
+                        return 0;
+                }
+                db_init=true;
+        */      return 0;
+        }
+
+}
+
 int CConSendData::SendData(){
-	if(ReadWaitingList()&&waiting_list.size()>0){
+       /*	if(ReadWaitingList()&&waiting_list.size()>0){
 		vector<char*>::iterator it=waiting_list.begin();
 		while(it!=waiting_list.end()){
             		if(Insert(*it)){
@@ -105,7 +153,7 @@ int CConSendData::SendData(){
 				++it;
 			}
 		}
-	}
+	}*/
 	char c_num[10];
 	sprintf(c_num,"%d",num);
 	string sql;
@@ -127,22 +175,22 @@ int CConSendData::SendData(){
 	sql+="',";
 	sql+=c_num;
 	sql+=")";
-	SaveToLocal(busid,current_date,current_dep_time,current_des_time,current_duration,current_departure,current_destination,c_num);
+	//SaveToLocal(busid,current_date,current_dep_time,current_des_time,current_duration,current_departure,current_destination,c_num);
 	//cout<<sql.data()<<endl;
 	if(db_init&&current_duration!="00:00:00"){
         	if(!Insert(sql.data())){
-			SaveToWaitingList((char*)sql.data());
+			//SaveToWaitingList((char*)sql.data());
 			return 0;
 		}
 		return 1;
 	}else{
-		SaveToWaitingList((char*)sql.data());
+	/*	SaveToWaitingList((char*)sql.data());
         	if(!Init((const char*)db_addr,(const char*)db_user,(const char*)db_pswd,(const char*)db_name,port)){
 			perror("Fail to connet to database!\n");
 			return 0;
 		}
 		db_init=true;
-		return 0;
+	*/	return 0;
 	}
 }
 

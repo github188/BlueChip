@@ -2,6 +2,9 @@
 //Use of the source code is governed by a LPGL-style.
 //License that can be found in the LICENSE file.
 //Author: Yun Luo(lauren.luo@extremevision.mo).
+//This class is designed for counting people on bus.
+//Actually, the key work of this class is to decide the direction
+//of counting.
 
 #ifndef BLUECHIP_INC_VIDEO_PROC_H_
 #define BLUECHIP_INC_VIDEO_PROC_H_
@@ -19,25 +22,12 @@ using namespace cv;
 #include <vector>
 using namespace std;
 
-#include "con_gps.h"
-#include "con_send_data.h"
-#include "count_log.h"
-//#include "gmm4busybackground.h"
+#include "con_count.h"
 
-enum Status
-{
-	onRoad,
-	onRest,
-	Boarding,
-	Debusing
-};
-
-class CVideoProc
-{
+class CVideoProc{
         public:
         	CVideoProc();
 		~CVideoProc();
-		void InitClassifier();
 		/* @param frame: input gray frame */
 		int Process(const Mat frame);
 	protected:
@@ -47,31 +37,15 @@ class CVideoProc
         	int FindSegmenty(int* histdat,int length,int* thresh0,int* thresh1);
             	int Init(IplImage* image);
                 void DrawRect(IplImage* img,CvRect rect,CvScalar cvbgr);
-		int FindHead(Mat frameROI_grey);
-		void CheckStatus();
         private:
-		//Status of bus
-		Status status;
-
-		//head classifier
-		CascadeClassifier head_cascade;
-
 		//foreground area
         	CvRect destination[2];
-
-		//passenger number
-        	int m_iIn;
 
 		//direction detect area
         	int m_x;
         	int m_y;
         	int m_width;
         	int m_height;
-		
-		//latest start time
-		char* start;
-		//earliest  end time
-		char* end;
 		
 		//frame number
         	int nFrmNum;
@@ -103,22 +77,7 @@ class CVideoProc
 		//direction
 		bool in;
 
-		//GMM4BusyBackground
-		//dbs::GMM4BusyBackground* gmm4busybackground;
-
-		//GPS
-		CConGPS* conGPS;
-
-		//send data to remote database
-		CConSendData* conSendData;
-
-	        //Log
-        	CLog* log;
-
-		//location
-		char* current_location;
-		char* dep;
-		char* des;
+		ConCount* conCount;
 };
 
 #endif //BLUECHIP_INC_VIDEO_PROC_H_

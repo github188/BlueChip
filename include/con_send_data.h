@@ -39,6 +39,7 @@ class CConSendData : public IMySql {
 		inline void GetEndTime(char* end){
 			current_des_time = end;
 		}
+                int SendData(char* start,char* end,char* des,char* dep,int passager);
 	protected:
         	int InitConSendData();
 		int SendData();

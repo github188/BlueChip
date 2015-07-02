@@ -20,7 +20,7 @@ DIR_3RD_X264 = ${DIR_3RD}/x264
 DIR_LIB_X264 = ${DIR_LIB}/lib_x264
 #jrtp
 DIR_3RD_JRTP = ${DIR_3RD}/jrtplib3
-DIR_LIB_JRTP = ${DIR_LIB}/lib_jrtp
+#DIR_LIB_JRTP = ${DIR_LIB}/lib_jrtp
 
 $(shell mkdir -p ${DIR_OBJ})
 $(shell mkdir -p ${DIR_BIN})
@@ -36,8 +36,8 @@ TARGET = Bus_Counting_V3.0
 BIN_TARGET = ${DIR_BIN}/${TARGET}
 
 LIBS_OPENCV = -lopencv_core -lopencv_highgui -lopencv_calib3d -lopencv_contrib -lopencv_features2d -lopencv_flann -lopencv_gpu -lopencv_imgproc -lopencv_legacy -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_video
-LIBS_MYSQL = -lmysqlclient
-LIBS_X264 = -lpthread -lx264 -ljrtp -lm
+#LIBS_MYSQL = -lmysqlclient
+LIBS_X264 = -lpthread -lx264 -lm #-ljrtp
 
 ${BIN_TARGET} : ${OBJ}
 	$(CC) $(OBJ) -o $@ $(LDFLAGS) ${LIBS_OPENCV} ${LIBS_MYSQL} ${LIBS_X264}
