@@ -14,10 +14,10 @@ CLog::CLog(){
     }
 	pclose(pp);
 	time_t t = time(0);
-	strftime(logfile,sizeof(logfile),"/root/logs/%Y%m%d.dat",localtime(&t));
+	strftime(logfile,sizeof(logfile),"/root/logs/%Y%m%d.log",localtime(&t));
     ofstream outfile(logfile,ios::app);
     if(!outfile){
-        perror("Fail to open waiting list!\n");
+        perror("Fail to open log file!\n");
         return;
     }
     outfile<<"Time    Latitude    Longitude   Count"<<endl;
@@ -30,7 +30,7 @@ CLog::~CLog(){
 void CLog::Mark(int n, char* ctime,double latitude,double longitude){
     ofstream outfile(logfile,ios::app);
     if(!outfile){
-        perror("Fail to open waiting list!\n");
+        perror("Fail to open log file!\n");
         return;
     }
     outfile<<ctime<<" "<<latitude<<" "<<longitude<<" "<<n<<endl;

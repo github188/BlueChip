@@ -23,6 +23,7 @@ using namespace cv;
 using namespace std;
 
 #include "con_count.h"
+#include "con_gps.h"
 
 class CVideoProc{
         public:
@@ -78,6 +79,10 @@ class CVideoProc{
 		bool in;
 
 		ConCount* conCount;
+		CConGPS* conGPS;
+
+		int passager;
+		bool send;
 };
 
 #endif //BLUECHIP_INC_VIDEO_PROC_H_

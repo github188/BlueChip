@@ -10,6 +10,8 @@
 #define WIDTH 720
 #define HEIGHT 480
 
+#define COUNT 3
+
 Encoder en;
 
 int convert_yuv_to_rgb_pixel(int y, int u, int v){
@@ -109,6 +111,8 @@ CUsbStream::CUsbStream(){
         encoder = new CEncoder();
         saveFps=2;
         bSave=false;
+
+		count=COUNT;
 }
 
 CUsbStream::~CUsbStream(){
@@ -326,31 +330,34 @@ int CUsbStream::start_capturing(int fd){
 
 //将采集好的数据放到文件中
 int CUsbStream::process_image(void *addr,int length){
-    	/* For gray frame */
+  count--;
+  if(count==0){
+    count=COUNT;
+    	/* For gray frame *
         m_Image = cvCreateImageHeader(cvSize(WIDTH,HEIGHT),IPL_DEPTH_8U,1);
         delete p;
         p=new uchar[m_height*m_width];
         spliteY((uchar*)addr,p,m_width,m_height);
-    	cvSetData(m_Image,p,m_width);
-    	/********** For rgb frame *********
+    	cvSetData(m_Image,p,m_width);*/
+    	/********** For rgb frame *********/
     	m_Image = cvCreateImageHeader(cvSize(WIDTH,HEIGHT),IPL_DEPTH_8U,3);
     	delete p;
     	p=new uchar[m_height*m_width*3+1];
     	yuvtorgb0((unsigned char*)addr,p,m_width,m_height);
     	cvSetData(m_Image,p,m_width*3);
-    	************************************/
+    	/************************************/
 	
 	/* gmm4busybackground */
-	cv::Mat frame(m_Image,1);
+	cv::Mat frame(m_Image);
 	gmm4busybackground->Process(frame);
 
-	cv::Mat frame2 = gmm4busybackground->GetBackground2();
-	cv::Mat frame2_gray(480,720,CV_8UC1)
+	cv::Mat frame2=gmm4busybackground->GetBackground2();
+	cv::Mat frame2_gray(480,720,CV_8UC1);
 	cv::cvtColor(frame2,frame2_gray,CV_BGR2GRAY);
 
     	/* video process */
  	IplImage frame_tmp=(IplImage)(frame2_gray);
-	IplImage* ipl_frame = &frame_tmp;
+ 	IplImage* ipl_frame = &frame_tmp;
     	videoProc->Process(ipl_frame);
 	
     	/* write date and time */
@@ -360,7 +367,7 @@ int CUsbStream::process_image(void *addr,int length){
         cvPutText(m_Image,datentime,cvPoint(15,50),&font,CV_RGB(255,0,0));
 
     	/* show image */
-    	cvShowImage("Video Frame",m_Image);
+   // 	cvShowImage("Video Frame",m_Image);
 
 	/* save as video */
         if(bSave){
@@ -401,7 +408,7 @@ int CUsbStream::process_image(void *addr,int length){
         }
 
     	cvWaitKey(1);
-
+  }
         return 0;
 }
 

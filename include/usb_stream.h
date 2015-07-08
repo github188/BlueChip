@@ -100,6 +100,8 @@ class CUsbStream
 		int saveFps;
 		bool bSave;
 		char* init_dir;
+
+		int count;
 };
 #endif //BLUECHIP_INC_USB_STREAM_H_
 

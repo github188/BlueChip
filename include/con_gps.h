@@ -36,9 +36,10 @@ class CConGPS : public IConGPS
 		//@return location
 		int CompareLocation(char** location=NULL);
 		int Init();
-	private:
+		int ShowLocation();
 		double latitude;
 		double longitude; 
+	private:
 		vector<double> g_latitude;
 		vector<double> g_longitude;
 		vector<char*> g_location;

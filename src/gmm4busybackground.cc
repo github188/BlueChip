@@ -37,14 +37,17 @@ void GMM4BusyBackground::Process(const cv::Mat& frame, bool display){
   //process.
   mog_bg(frame,background,0.01);
   mog_bg.getBackgroundImage(background);
-  mog_bg2(frame,background2,0.5);  
+  mog_bg2(frame,background2,1);  
   mog_bg2.getBackgroundImage(background2);
   
   //frame diff.
+  mog_bg.getBackgroundImage(background);
   cv::cvtColor(background,background_gray,CV_BGR2GRAY);
+  mog_bg2.getBackgroundImage(background2);
   cv::cvtColor(background2,background2_gray,CV_BGR2GRAY);
+
   cv::absdiff(background_gray,background2_gray,foreground);
-  cv::threshold(foreground,foreground,75,255,cv::THRESH_BINARY);
+  cv::threshold(foreground,foreground,25,255,cv::THRESH_BINARY);
   cv::erode(foreground,foreground,cv::Mat());
   cv::dilate(foreground,foreground,cv::Mat());
 

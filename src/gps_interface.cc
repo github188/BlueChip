@@ -48,10 +48,10 @@ double IConGPS::get_longitude(){
 
 int IConGPS::get_status(){
 	if(GPS->status=='A'){
-		printf("data available\n");
+		//printf("data available\n");
 		return 1;
 	}else{
-		printf("data not available\n");
+		//printf("data not available\n");
 		return 0;
 	}
 }
@@ -231,9 +231,9 @@ void IConGPS::receive()
 	memset(GPS_BUF,0,1024);
 	int nread=read(Gpsfd,GPS_BUF,1024);
 	if(nread>0){
-		printf("\n GPS DATALen=%d\n",nread);
+		//printf("\n GPS DATALen=%d\n",nread);
 		GPS_BUF[nread]='\0';
-		printf("GPS %s \n",GPS_BUF);
+		//printf("GPS %s \n",GPS_BUF);
 	}
 }
 
@@ -260,7 +260,7 @@ void IConGPS::gps_parse(){
 			int tmp;
 			char c;
 			c=GPS_BUF[j+6];
-			cout<<c<<endl;
+			//cout<<c<<endl;
 			if(c=='C'){
 				//GPRMC
 				int k=i-j;
@@ -269,7 +269,7 @@ void IConGPS::gps_parse(){
 					buf[m]=GPS_BUF[j+1+m];
 				}
 				buf[k]='\0';
-				printf("$GPRMC: %s \n",buf);
+				//printf("$GPRMC: %s \n",buf);
 				/*parse*/
 				GPS->D.hour=(buf[7]-'0')*10+(buf[8]-'0');
 				GPS->D.minute=(buf[9]-'0')*10+(buf[10]-'0');
@@ -288,7 +288,7 @@ void IConGPS::gps_parse(){
 				UTC2BTC(&GPS->D);
 			}
 			if(c=='A'){
-				cout<<"A"<<endl;
+				//cout<<"A"<<endl;
 				//GPGGA
 				GPS->high=get_double_number(&buf[get_comma(9,buf)]);
 			}

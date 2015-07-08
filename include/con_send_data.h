@@ -39,9 +39,9 @@ class CConSendData : public IMySql {
 		inline void GetEndTime(char* end){
 			current_des_time = end;
 		}
-                int SendData(char* start,char* end,char* des,char* dep,int passager);
-	protected:
-        	int InitConSendData();
+        int SendData(char* start,char* end,char* des,char* dep,int passager);
+        int InitConSendData();
+    protected:
 		int SendData();
 		string delta_time(const char* src_starttime,const char* src_arrivetime);		
 		int SaveToWaitingList(char* sql);

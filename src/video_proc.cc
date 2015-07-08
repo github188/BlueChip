@@ -34,10 +34,15 @@ CVideoProc::CVideoProc(){
     	m_highlow=2500;
     	objforori1=0;
     	objforori2=0;
-        m_menxian=25;
+        m_menxian=75;
         //direction
         in = false;
 	conCount = new ConCount();
+	conGPS = new CConGPS();
+	conGPS->Init();
+
+	passager=0;
+	send=false;
 }
 
 CVideoProc::~CVideoProc(){
@@ -78,6 +83,47 @@ int CVideoProc::Init(IplImage* m_image){
  *                            outside                                               *
  * **********************************************************************************/
 int CVideoProc::Process(const Mat frame){
+		int k=conGPS->ShowLocation();
+		switch(k){
+				case 0:return 1;
+				case 1:return 1;
+				case 2:
+					   {
+							   if(send){
+									   send=false;
+									   //end time.
+									   //send datai.
+									   
+									   passager=0;
+
+							   }
+							   //begin time
+                               cout<<"k"<<endl;
+							   break;
+					   }
+				case 3:
+					   {
+							   if(send){
+							       send=false;
+								   //begin time.
+							   }
+							   cout<<"K"<<endl;
+							   break;
+					   }
+				case 4:
+					   {
+							   if(!send){
+							       send=true;
+								   //end time.
+							       //send data.
+
+								   passager=0;
+
+							   }
+							   return 1;
+					   }
+		}
+
     	IplImage image_tmp = (IplImage)(frame);
     	image = &image_tmp;
 
@@ -106,7 +152,7 @@ int CVideoProc::Process(const Mat frame){
         }
 	
         /***************** return number of area **********************/
-        int p = CalHist(absthresh);
+/*        int p = CalHist(absthresh);
 
         if((destination[0].y+destination[0].height>80)&&(destination[0].height>40)){
             DrawRect(absthresh,destination[0],CV_RGB(255,255,255));
@@ -119,7 +165,7 @@ int CVideoProc::Process(const Mat frame){
         //cvLine(absthresh,cvPoint(15,15),cvPoint(250,250),CV_RGB(255,255,255),3,8,0); //test line
         //cvShowImage("image",absthresh);
 
-    	/************************ direction ***************************/
+*/    	/************************ direction ***************************/
 
         if((rect.x+rect.width)>image->width||(rect.y+rect.height)>image->height){
             cout<<"(!)--rect is out of the image--"<<endl;
@@ -185,11 +231,14 @@ int CVideoProc::Process(const Mat frame){
         	cvResetImageROI(gray);
             	if(objforori2+objforori1<0){
                 	in = true;
-			conCount->CountProcess(in);
+					printf("in\n");
+			//conCount->CountProcess(in);
                 	return 1;
         	}else if(objforori2+objforori1>0){
                 	in = false;
-			conCount->CountProcess(in);
+					printf("out\n");
+					
+			//conCount->CountProcess(in);
                 	return 1;
         	}
     	}

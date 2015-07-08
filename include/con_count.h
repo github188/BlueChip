@@ -15,9 +15,10 @@
 
 #include "con_gps.h"
 #include "con_send_data.h"
+#include "count_log.h"
 
-#define CHECK_NUM 10
-#define DIRECT_THRESH 7 
+#define CHECK_NUM 5
+#define DIRECT_THRESH 3 
 
 struct CountInfo{
   char time[64];
@@ -60,6 +61,8 @@ private:
   char* des; 
   //send data to database.
   CConSendData* conSendData;
+  //log
+  CLog* log;
 };
 
 #endif // BLUECHIP_INC_CON_COUNT_H_

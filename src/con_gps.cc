@@ -136,6 +136,32 @@ int CConGPS::Init(){
 	return 1;
 }
 
+int CConGPS::ShowLocation(){
+		if(!m_init){
+				if(!Init()){
+						cout<<"Location GPS have not been set yet!"<<endl;
+				}
+				return 0;
+		}else{
+				readGpsDev();
+				if(get_status()){
+						latitude=get_latitude();
+						longitude=get_longitude();
+						std::cout<<latitude<<" "<<longitude<<endl;
+				}
+				for(int i=0;i<g_latitude.size()-1;i++){
+						if(abs(latitude-g_latitude[i])<0.1f){
+								//@return 2:xinlihua
+								//@return 3:xinhaoi
+								//@return 4:leave xinhaoi
+								return i+2;
+						}
+						//cout<<g_latitude[i]<<" "<<g_longitude[i]<<endl;
+				}
+				return 1;
+		}
+}
+
 int CConGPS::CompareLocation(char** location){
 	if(!m_init){
 		if(!Init()){
@@ -147,7 +173,7 @@ int CConGPS::CompareLocation(char** location){
         	if(get_status()){
             		latitude=get_latitude();
             		longitude=get_longitude();
-			
+			        std::cout<<latitude<<" "<<longitude;
                     double dis = 2.000000;
                     int n=0;
 		
