@@ -149,7 +149,7 @@ int CConGPS::ShowLocation(){
 						std::cout<<latitude<<" "<<longitude<<endl;
 				}
 				for(int i=0;i<g_latitude.size()-1;i++){
-                        if((fabs(latitude-g_latitude[i])<0.0001f)&&(fabs(longitude-g_longitude[i])<0.001f)){
+                        if((fabs(latitude-g_latitude[i])<0.0002f)&&(fabs(longitude-g_longitude[i])<0.001f)){
 								//@return 2:xinlihua
 								//@return 3:xinhaoi
 								//@return 4:leave xinhaoi
