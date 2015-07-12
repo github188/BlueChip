@@ -37,12 +37,16 @@ CVideoProc::CVideoProc(){
         m_menxian=75;
         //direction
         in = false;
-	conCount = new ConCount();
-	conGPS = new CConGPS();
-	conGPS->Init();
+        conCount = new ConCount();
+        conGPS = new CConGPS();
+        conGPS->Init();
 
-	passager=0;
-	send=false;
+        conSenddata=new CConSendData();
+        passager=0;
+        send=false;
+        des=new char[64];
+        dep=new char[64];
+        dep="";
 }
 
 CVideoProc::~CVideoProc(){
@@ -70,6 +74,56 @@ int CVideoProc::Init(IplImage* m_image){
         return 1;
 }
 
+int CVideoProc::CheckStatus(){
+    int k=conGPS->ShowLocation();
+    switch(k){
+            case 0:return 0;
+            case 1:return 0;
+            case 2:
+                   {
+//                           if(send){
+//                                   send=false;
+//                                   //end time.
+//                                   conGPS->CompareLocation(&des);
+//                                   conSenddata->SendArriveSignal(des);
+//                                   //send data.
+//                                  conSenddata->GetData(passager);
+//                                   passager=0;
+
+//                           }
+//                           //begin time
+//                           dep=des;
+//                           conSenddata->SendLeaveSignal(dep);
+                           return 1;
+                           //break;
+                   }
+            case 3:
+                   {
+//                           if(send){
+//                               send=false;
+//                               //begin time.
+//                               conGPS->CompareLocation(&dep);
+//                               conSenddata->SendLeaveSignal(dep);
+//                           }
+                            return 1;
+                           //break;
+                   }
+            case 4:
+                   {
+//                           if(!send){
+//                               send=true;
+//                               //end time.
+//                               conGPS->CompareLocation(&des);
+//                               conSenddata->SendArriveSignal(des);
+//                               //send data.
+//                               conSenddata->GetData(passager);
+//                               passager=0;
+//                           }
+                           return 1;
+                   }
+    }
+}
+
 /* **********************************************************************************
  * rect:                 inside(onboard)                                            *
  *  ___________________________|________________________________________            *
@@ -83,46 +137,13 @@ int CVideoProc::Init(IplImage* m_image){
  *                            outside                                               *
  * **********************************************************************************/
 int CVideoProc::Process(const Mat frame){
-		int k=conGPS->ShowLocation();
-		switch(k){
-				case 0:return 1;
-				case 1:return 1;
-				case 2:
-					   {
-							   if(send){
-									   send=false;
-									   //end time.
-									   //send datai.
-									   
-									   passager=0;
 
-							   }
-							   //begin time
-                               cout<<"k"<<endl;
-							   break;
-					   }
-				case 3:
-					   {
-							   if(send){
-							       send=false;
-								   //begin time.
-							   }
-							   cout<<"K"<<endl;
-							   break;
-					   }
-				case 4:
-					   {
-							   if(!send){
-							       send=true;
-								   //end time.
-							       //send data.
-
-								   passager=0;
-
-							   }
-							   return 1;
-					   }
-		}
+    if(!CheckStatus){
+        return 0;
+    }else{
+        std::cout<<"gps reach.."<<std::endl;
+        return 1;
+    }
 
     	IplImage image_tmp = (IplImage)(frame);
     	image = &image_tmp;
@@ -176,7 +197,7 @@ int CVideoProc::Process(const Mat frame){
         //cvCvtColor(image,gray,CV_BGR2GRAY); //for rgb use
         //cvCopy(image,gray); //for gray use
         cvThreshold(image,gray,m_menxian,255,CV_THRESH_BINARY_INV);
-    //	cvShowImage("gray",gray);
+        //	cvShowImage("gray",gray);
 
         cvResetImageROI(gray);
         cvShowImage("gray_rest",gray);

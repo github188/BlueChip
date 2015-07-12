@@ -24,6 +24,7 @@ using namespace std;
 
 #include "con_count.h"
 #include "con_gps.h"
+#include "con_send_data.h"
 
 class CVideoProc{
         public:
@@ -38,6 +39,8 @@ class CVideoProc{
         	int FindSegmenty(int* histdat,int length,int* thresh0,int* thresh1);
             	int Init(IplImage* image);
                 void DrawRect(IplImage* img,CvRect rect,CvScalar cvbgr);
+
+                int CheckStatus();
         private:
 		//foreground area
         	CvRect destination[2];
@@ -81,8 +84,11 @@ class CVideoProc{
 		ConCount* conCount;
 		CConGPS* conGPS;
 
+        CConSendData* conSenddata;
 		int passager;
 		bool send;
+        char* dep;
+        char* des;
 };
 
 #endif //BLUECHIP_INC_VIDEO_PROC_H_

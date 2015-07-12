@@ -347,17 +347,17 @@ int CUsbStream::process_image(void *addr,int length){
     	cvSetData(m_Image,p,m_width*3);
     	/************************************/
 	
-	/* gmm4busybackground */
-	cv::Mat frame(m_Image);
-	gmm4busybackground->Process(frame);
+        /* gmm4busybackground */
+        cv::Mat frame(m_Image);
+        gmm4busybackground->Process(frame);
 
-	cv::Mat frame2=gmm4busybackground->GetBackground2();
-	cv::Mat frame2_gray(480,720,CV_8UC1);
-	cv::cvtColor(frame2,frame2_gray,CV_BGR2GRAY);
+        cv::Mat frame2=gmm4busybackground->GetBackground2();
+        cv::Mat frame2_gray(480,720,CV_8UC1);
+        cv::cvtColor(frame2,frame2_gray,CV_BGR2GRAY);
 
     	/* video process */
- 	IplImage frame_tmp=(IplImage)(frame2_gray);
- 	IplImage* ipl_frame = &frame_tmp;
+        IplImage frame_tmp=(IplImage)(frame2_gray);
+        IplImage* ipl_frame = &frame_tmp;
     	videoProc->Process(ipl_frame);
 	
     	/* write date and time */

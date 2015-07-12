@@ -94,13 +94,8 @@ int CConSendData::InitConSendData(){
 	return 1;
 }
 
-int CConSendData::SendData(char* start,char* end,char* des,char* dep,int passager){
-        current_dep_time=start;
-        current_des_time=end;
-        current_departure=dep;
-        current_destination=des;
-        current_duration=delta_time(start,end);
-
+int CConSendData::SendData(){
+    if(current_departure==""){return 0;}
         char c_num[10];
         sprintf(c_num,"%d",passager);
         string sql;                                                         
