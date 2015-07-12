@@ -94,7 +94,7 @@ int CConSendData::InitConSendData(){
 	return 1;
 }
 
-int CConSendData::SendData(){
+int CConSendData::SendData(char* start,char* end,char* des,char* dep,int passager){
     if(current_departure==""){return 0;}
         char c_num[10];
         sprintf(c_num,"%d",passager);
