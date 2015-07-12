@@ -138,7 +138,7 @@ int CVideoProc::CheckStatus(){
  * **********************************************************************************/
 int CVideoProc::Process(const Mat frame){
 
-    if(!CheckStatus){
+    if(!CheckStatus()){
         return 0;
     }else{
         std::cout<<"gps reach.."<<std::endl;
