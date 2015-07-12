@@ -21,7 +21,7 @@
 using namespace std; 
 
 #define DATAFILE "/root/BlueChip/data/locations.dat"
-#define RADIU 0.00005
+#define RADIU 0.00001f
 
 CConGPS::CConGPS(){
 	latitude=0.000000;
@@ -149,7 +149,7 @@ int CConGPS::ShowLocation(){
 						std::cout<<latitude<<" "<<longitude<<endl;
 				}
 				for(int i=0;i<g_latitude.size()-1;i++){
-                        if(abs(latitude-g_latitude[i])<RADIU&&abs(longitude-g_longitude[i]<RADIU)){
+                        if(abs(latitude-g_latitude[i])<0.00001&&abs(longitude-g_longitude[i]<0.00001)){
 								//@return 2:xinlihua
 								//@return 3:xinhaoi
 								//@return 4:leave xinhaoi
