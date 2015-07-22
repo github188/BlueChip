@@ -125,7 +125,7 @@ int CConGPS::Init(){
 	if(g_latitude.size()==0){
 		return 0;
 	}
-	for(int i=0;i<g_latitude.size()-1;i++){
+    for(int i=0;i<g_latitude.size();i++){
 		cout<<g_latitude[i]<<" "<<g_longitude[i]<<" "<<g_location[i]<<endl;
 	}
     if(initGpsDev()==-1){
