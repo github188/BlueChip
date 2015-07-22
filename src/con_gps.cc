@@ -155,7 +155,7 @@ int CConGPS::ShowLocation(){
 								//@return 4:leave xinhaoi
 								return i+2;
 						}
-						//cout<<g_latitude[i]<<" "<<g_longitude[i]<<endl;
+                        cout<<g_latitude[i]<<" "<<g_longitude[i]<<endl;
 				}
 				return 1;
 		}

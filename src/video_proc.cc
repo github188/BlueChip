@@ -137,13 +137,15 @@ int CVideoProc::CheckStatus(){
  *                            outside                                               *
  * **********************************************************************************/
 int CVideoProc::Process(const Mat frame){
-
+    /************************* check location ****************************/
     if(!CheckStatus()){
         return 0;
     }else{
         std::cout<<"gps reach.."<<std::endl;
         return 1;
     }
+    /*************************check location end *************************/
+
 
     	IplImage image_tmp = (IplImage)(frame);
     	image = &image_tmp;
@@ -200,7 +202,7 @@ int CVideoProc::Process(const Mat frame){
         //	cvShowImage("gray",gray);
 
         cvResetImageROI(gray);
-        cvShowImage("gray_rest",gray);
+        //cvShowImage("gray_rest",gray);
   
     	last_objpix=objpix;
     	if(up==TRUE){
@@ -250,7 +252,7 @@ int CVideoProc::Process(const Mat frame){
         	cvSetImageROI(gray,rect2);
         	objforori2=cvCountNonZero(gray)-objforori2;
         	cvResetImageROI(gray);
-            	if(objforori2+objforori1<0){
+            if(objforori2+objforori1<0){
                 	in = true;
 					printf("in\n");
 			//conCount->CountProcess(in);
